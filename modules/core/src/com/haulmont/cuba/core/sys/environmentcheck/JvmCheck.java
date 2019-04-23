@@ -30,7 +30,7 @@ public class JvmCheck implements EnvironmentCheck {
         String javaVersion = SystemUtils.JAVA_VERSION;
         if (!SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_1_8)) {
             result.add(new CheckFailedResult(
-                    String.format("Unsupported java version detected: %s; Cuba supports Java 8 and higher", javaVersion),
+                    String.format("Unsupported Java version detected: %s; Cuba supports Java 8 and higher", javaVersion),
                     null));
         }
         return result;

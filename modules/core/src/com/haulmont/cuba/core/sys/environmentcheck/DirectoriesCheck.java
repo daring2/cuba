@@ -17,6 +17,7 @@
 package com.haulmont.cuba.core.sys.environmentcheck;
 
 import com.haulmont.cuba.core.sys.AppContext;
+import com.haulmont.cuba.core.sys.dbupdate.ScriptResource;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -28,60 +29,46 @@ public class DirectoriesCheck implements EnvironmentCheck {
     @Override
     public List<CheckFailedResult> doCheck() {
         List<CheckFailedResult> result = new ArrayList<>();
-        String dataDir = AppContext.getProperty("cuba.dataDir");
-        if (dataDir != null) {
-            File dataDirFile = new File(dataDir);
-            boolean readable = Files.isReadable(dataDirFile.toPath());
-            boolean writable = Files.isWritable(dataDirFile.toPath());
-            boolean isDir = dataDirFile.isDirectory();
-            if (!writable && !isDir) {
-                try {
-                    isDir = dataDirFile.mkdirs();
-                    readable = Files.isReadable(dataDirFile.toPath());
-                    writable = Files.isWritable(dataDirFile.toPath());
-                } catch (SecurityException e) {
-                    result.add(new CheckFailedResult(
-                            String.format("Wrong permissions for work directory. Readable: %b, Writable: %b",
-                                    readable, writable), e));
-                }
-            }
-            if (!writable || !readable || !isDir) {
-                result.add(new CheckFailedResult(
-                        String.format("Wrong permissions for work directory. Readable: %b, Writable: %b, Is directory: %b",
-                                readable, writable, isDir), null));
-            }
-        } else {
-            result.add(new CheckFailedResult("Unable to get work directory path from \'cuba.dataDir\' property",
-                    null));
+        CheckFailedResult dataResult = checkDirectory("cuba.dataDir");
+        CheckFailedResult tempResult = checkDirectory("cuba.tempDir");
+        if (dataResult != null) {
+            result.add(dataResult);
         }
-
-        String tempDir = AppContext.getProperty("cuba.tempDir");
-        if (tempDir != null) {
-            File tempDirFile = new File(tempDir);
-            boolean readable = Files.isReadable(tempDirFile.toPath());
-            boolean writable = Files.isWritable(tempDirFile.toPath());
-            boolean isDir = tempDirFile.isDirectory();
-            if (!writable && !isDir) {
-                try {
-                    isDir = tempDirFile.mkdirs();
-                    readable = Files.isReadable(tempDirFile.toPath());
-                    writable = Files.isWritable(tempDirFile.toPath());
-                } catch (SecurityException e) {
-                    result.add(new CheckFailedResult(
-                            String.format("Wrong permissions for temporary directory. Readable: %b, Writable: %b",
-                                    readable, writable), e));
-                }
-            }
-            if (!writable || !readable || !isDir) {
-                result.add(new CheckFailedResult(
-                        String.format("Wrong permissions for temporary directory. Readable: %b, Writable: %b, Is directory: %b",
-                                readable, writable, isDir), null));
-            }
-        } else {
-            result.add(new CheckFailedResult("Unable to get temporary directory path from \'cuba.tempDir\' property",
-                    null));
+        if (tempResult != null) {
+            result.add(tempResult);
         }
-
         return result;
+    }
+
+    protected CheckFailedResult checkDirectory(String dirKey) {
+        String dir = AppContext.getProperty(dirKey);
+        if (dir != null) {
+            File dirFile = new File(dir);
+            boolean readable = Files.isReadable(dirFile.toPath());
+            boolean writable = Files.isWritable(dirFile.toPath());
+            boolean isDir = dirFile.isDirectory();
+            if (!writable && !isDir) {
+                try {
+                    isDir = dirFile.mkdirs();
+                    readable = Files.isReadable(dirFile.toPath());
+                    writable = Files.isWritable(dirFile.toPath());
+                } catch (SecurityException e) {
+                    return new CheckFailedResult(
+                            String.format("Directory \'%s\' must have read and write permissions." +
+                                            " Current permissions: Readable: %b, Writable: %b",
+                                    dirKey, readable, writable), e);
+                }
+            }
+            if (!writable || !readable || !isDir) {
+                return new CheckFailedResult(
+                        String.format("Directory \'%s\' must have read and write permissions. " +
+                                        "Current permissions: Readable: %b, Writable: %b, Is directory: %b",
+                                dirKey, readable, writable, isDir), null);
+            }
+        } else {
+            return new CheckFailedResult(String.format("Unable to get directory path from \'%s\' property", dirKey),
+                    null);
+        }
+        return null;
     }
 }

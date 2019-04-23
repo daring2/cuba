@@ -48,10 +48,12 @@ public class DataStoresCheck implements EnvironmentCheck {
                     connection = dataSource.getConnection();
                     DatabaseMetaData dbMetaData = connection.getMetaData();
                     DbProperties dbProperties = new DbProperties(dbMetaData.getURL());
+                    boolean isRequiresCatalog = DbmsSpecificFactory.getDbmsFeatures().isRequiresDbCatalogName();
                     boolean isSchemaByUser = DbmsSpecificFactory.getDbmsFeatures().isSchemaByUser();
+                    String catalogName = isRequiresCatalog ? connection.getCatalog() : null;
                     String schemaName = isSchemaByUser ?
                             dbMetaData.getUserName() : dbProperties.getCurrentSchemaProperty();
-                    ResultSet tables = dbMetaData.getTables(null, schemaName, "%", null);
+                    ResultSet tables = dbMetaData.getTables(catalogName, schemaName, "%", null);
                     boolean found = false;
                     while (tables.next()) {
                         String tableName = tables.getString("TABLE_NAME");
@@ -60,18 +62,18 @@ public class DataStoresCheck implements EnvironmentCheck {
                         }
                     }
                     if (!found) {
-                        result.add(new CheckFailedResult("Main Database checked but SEC_USER table is not found", null));
+                        result.add(new CheckFailedResult("Main Data Store checked but SEC_USER table is not found", null));
                     }
                     connection.close();
                 } catch (SQLException e) {
-                    result.add(new CheckFailedResult("Exception occurred while connecting to main Database", e));
+                    result.add(new CheckFailedResult("Exception occurred while connecting to main Data Store", e));
                 } finally {
                     try {
                         if (connection != null) {
                             connection.close();
                         }
                     } catch (SQLException e) {
-                        result.add(new CheckFailedResult("Exception occurred while closing connection to main Database", e));
+                        result.add(new CheckFailedResult("Exception occurred while closing connection to main Data Store", e));
                     }
                 }
             } else {
@@ -80,14 +82,14 @@ public class DataStoresCheck implements EnvironmentCheck {
                     connection = dataSource.getConnection();
                     connection.getMetaData();
                 } catch (SQLException e) {
-                    result.add(new CheckFailedResult("Exception occurred while connecting to main Database", e));
+                    result.add(new CheckFailedResult("Exception occurred while connecting to main Data Store", e));
                 } finally {
                     try {
                         if (connection != null) {
                             connection.close();
                         }
                     } catch (SQLException e) {
-                        result.add(new CheckFailedResult("Exception occurred while closing connection to main Database", e));
+                        result.add(new CheckFailedResult("Exception occurred while closing connection to main Data Store", e));
                     }
                 }
             }
@@ -98,36 +100,46 @@ public class DataStoresCheck implements EnvironmentCheck {
         String additionalStores = AppContext.getProperty("cuba.additionalStores");
         if (additionalStores != null) {
             for (String storeName : additionalStores.replaceAll("\\s", "").split(",")) {
-                connection = null;
-                String storeJndiName = AppContext.getProperty("cuba.dataSourceJndiName_" + storeName);
-                try {
-                    dataSource = lookup.getDataSource(storeJndiName == null ? "" : storeJndiName);
-                    connection = dataSource.getConnection();
-                    connection.getMetaData();
-                } catch (DataSourceLookupFailureException e) {
-                    String beanName = AppContext.getProperty("cuba.storeImpl_" + storeName);
-                    if (beanName == null) {
-                        result.add(new CheckFailedResult(
-                                String.format("Can not find JNDI datasource for additional Data Store: %s", storeName),
-                                null));
-                    }
-                } catch (SQLException e) {
-                    result.add(new CheckFailedResult(
-                            String.format("Exception occurred while connecting to additional Data Store: %s", storeName),
-                            e));
-                } finally {
-                    try {
-                        if (connection != null) {
-                            connection.close();
-                        }
-                    } catch (SQLException e) {
-                        result.add(new CheckFailedResult(
-                                String.format("Exception occurred while closing connection to additional Data Store: %s", storeName),
-                                e));
-                    }
+                CheckFailedResult checkFailedResult = checkDataStore(storeName);
+                if (checkFailedResult != null) {
+                    result.add(checkFailedResult);
                 }
             }
         }
         return result;
+    }
+
+    protected CheckFailedResult checkDataStore(String storeName) {
+        JndiDataSourceLookup lookup = new JndiDataSourceLookup();
+        DataSource dataSource;
+        Connection connection = null;
+        String storeJndiName = AppContext.getProperty("cuba.dataSourceJndiName_" + storeName);
+        try {
+            dataSource = lookup.getDataSource(storeJndiName == null ? "" : storeJndiName);
+            connection = dataSource.getConnection();
+            connection.getMetaData();
+        } catch (DataSourceLookupFailureException e) {
+            String beanName = AppContext.getProperty("cuba.storeImpl_" + storeName);
+            if (beanName == null) {
+                return new CheckFailedResult(
+                        String.format("Can not find JNDI datasource for additional Data Store: %s", storeName),
+                        null);
+            }
+        } catch (SQLException e) {
+            return new CheckFailedResult(
+                    String.format("Exception occurred while connecting to additional Data Store: %s", storeName),
+                    e);
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                return new CheckFailedResult(
+                        String.format("Exception occurred while closing connection to additional Data Store: %s", storeName),
+                        e);
+            }
+        }
+        return null;
     }
 }

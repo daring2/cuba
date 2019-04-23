@@ -93,22 +93,6 @@ public class AppContextLoader extends AbstractWebAppContextLoader {
 
     protected void runEnvironmentSanityChecks() {
         EnvironmentChecks checks = new EnvironmentChecks();
-        checks.addCheck(new JvmCheck());
-        checks.addCheck(new DirectoriesCheck());
-        checks.addCheck(new DataStoresCheck());
-        List<CheckFailedResult> checksResult = checks.runChecks();
-        if (!checksResult.isEmpty()) {
-            StringBuilder results = new StringBuilder();
-            results.append("\n=================================================================" +
-                    "\nSome of environment sanity checks failed:");
-            for (CheckFailedResult result : checksResult) {
-                results.append("\n");
-                results.append(result.getMessage());
-            }
-            results.append("\n=================================================================");
-            log.warn(results.toString());
-        } else {
-            log.info("Environment checks completed successfully");
-        }
+        checks.runChecks();
     }
 }

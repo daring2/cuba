@@ -31,6 +31,14 @@ public class EnvironmentChecks {
     private static final Logger log = LoggerFactory.getLogger(EnvironmentChecks.class);
     protected List<EnvironmentCheck> checks;
 
+    public EnvironmentChecks() {
+        addDefaultChecks();
+    }
+
+    public EnvironmentChecks(List<EnvironmentCheck> checks) {
+        this.checks = checks;
+    }
+
     public List<EnvironmentCheck> getChecks() {
         return checks;
     }
@@ -57,13 +65,25 @@ public class EnvironmentChecks {
         for (EnvironmentCheck check : checks) {
             results.addAll(check.doCheck());
         }
-        for (CheckFailedResult result : results) {
-            if (result.getException() != null) {
-                log.debug(result.getMessage(), result.getException());
-            } else {
-                log.debug(result.getMessage());
+        if (!results.isEmpty()) {
+            StringBuilder resultMessage = new StringBuilder();
+            resultMessage.append("\n=================================================================" +
+                    "\nSome of environment sanity checks failed:");
+            for (CheckFailedResult result : results) {
+                resultMessage.append("\n");
+                resultMessage.append(result.getMessage());
             }
+            resultMessage.append("\n=================================================================");
+            log.warn(resultMessage.toString());
+        } else {
+            log.info("Environment checks completed successfully");
         }
         return results;
+    }
+
+    protected void addDefaultChecks() {
+        addCheck(new JvmCheck());
+        addCheck(new DirectoriesCheck());
+        addCheck(new DataStoresCheck());
     }
 }
