@@ -33,7 +33,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -98,6 +98,32 @@ public class CubaUidlWriter extends UidlWriter {
                 }
             }
         }
+
+        if (hasDuplicateDependencies(scriptDependencies)) {
+            List<String> scripts = new ArrayList<>();
+            for (String dependency : scriptDependencies) {
+                if (!scripts.contains(dependency)) {
+                    scripts.add(dependency);
+                }
+            }
+            scriptDependencies.clear();
+            scriptDependencies.addAll(scripts);
+        }
+
+        if (hasDuplicateDependencies(styleDependencies)) {
+            List<String> styles = new ArrayList<>();
+            for (String dependency : styleDependencies) {
+                if (!styles.contains(dependency)) {
+                    styles.add(dependency);
+                }
+            }
+            styleDependencies.clear();
+            styleDependencies.addAll(styles);
+        }
+    }
+
+    protected boolean hasDuplicateDependencies(List<String> dependencies) {
+        return !dependencies.stream().allMatch(new HashSet<>()::add);
     }
 
     protected String getResourceActualPath(String uri, String overridePath) {
