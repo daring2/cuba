@@ -19,7 +19,10 @@ package com.haulmont.cuba.core.sys;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.haulmont.cuba.core.global.Stores;
-import com.haulmont.cuba.core.sys.environmentcheck.*;
+import com.haulmont.cuba.core.sys.environmentcheck.DataStoresCheck;
+import com.haulmont.cuba.core.sys.environmentcheck.DirectoriesCheck;
+import com.haulmont.cuba.core.sys.environmentcheck.EnvironmentChecksRunner;
+import com.haulmont.cuba.core.sys.environmentcheck.JvmCheck;
 import com.haulmont.cuba.core.sys.persistence.DbmsType;
 import com.haulmont.cuba.core.sys.persistence.PersistenceConfigProcessor;
 import org.slf4j.Logger;
@@ -92,7 +95,10 @@ public class AppContextLoader extends AbstractWebAppContextLoader {
     }
 
     protected void runEnvironmentSanityChecks() {
-        EnvironmentChecks checks = new EnvironmentChecks();
+        EnvironmentChecksRunner checks = new EnvironmentChecksRunner(getBlock());
+        checks.addCheck(new JvmCheck());
+        checks.addCheck(new DirectoriesCheck());
+        checks.addCheck(new DataStoresCheck());
         checks.runChecks();
     }
 }

@@ -26,16 +26,18 @@ import java.util.List;
 /**
  * System-level class for environment sanity checks.
  */
-public class EnvironmentChecks {
+public class EnvironmentChecksRunner {
 
-    private static final Logger log = LoggerFactory.getLogger(EnvironmentChecks.class);
+    private static final Logger log = LoggerFactory.getLogger(EnvironmentChecksRunner.class);
     protected List<EnvironmentCheck> checks;
+    protected String moduleName;
 
-    public EnvironmentChecks() {
-        addDefaultChecks();
+    public EnvironmentChecksRunner(String moduleName) {
+        this.moduleName = moduleName;
     }
 
-    public EnvironmentChecks(List<EnvironmentCheck> checks) {
+    public EnvironmentChecksRunner(String moduleName, List<EnvironmentCheck> checks) {
+        this.moduleName = moduleName;
         this.checks = checks;
     }
 
@@ -67,8 +69,10 @@ public class EnvironmentChecks {
         }
         if (!results.isEmpty()) {
             StringBuilder resultMessage = new StringBuilder();
-            resultMessage.append("\n=================================================================" +
-                    "\nSome of environment sanity checks failed:");
+            resultMessage.append("\n=================================================================");
+            resultMessage.append("\nSome of environment sanity checks failed on ");
+            resultMessage.append(moduleName);
+            resultMessage.append(" module:");
             for (CheckFailedResult result : results) {
                 resultMessage.append("\n");
                 resultMessage.append(result.getMessage());
@@ -76,14 +80,8 @@ public class EnvironmentChecks {
             resultMessage.append("\n=================================================================");
             log.warn(resultMessage.toString());
         } else {
-            log.info("Environment checks completed successfully");
+            log.info(String.format("Environment checks on %s module completed successfully", moduleName));
         }
         return results;
-    }
-
-    protected void addDefaultChecks() {
-        addCheck(new JvmCheck());
-        addCheck(new DirectoriesCheck());
-        addCheck(new DataStoresCheck());
     }
 }

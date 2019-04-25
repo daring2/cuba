@@ -17,7 +17,6 @@
 package com.haulmont.cuba.core.sys.environmentcheck;
 
 import com.haulmont.cuba.core.sys.AppContext;
-import com.haulmont.cuba.core.sys.dbupdate.ScriptResource;
 
 import java.io.File;
 import java.nio.file.Files;
