@@ -55,5 +55,5 @@ public enum PropertyType {
     TIME,
 
     // like columns, fields, etc
-    PARTS
+    ELEMENTS
 }

@@ -16,20 +16,15 @@
 
 package com.haulmont.cuba.gui.meta;
 
-import java.util.List;
+import java.lang.annotation.*;
 
-@SuppressWarnings("unused")
-public class TableMetaBlueprint {
+/**
+ * JavaDoc
+ */
+@Retention(RetentionPolicy.SOURCE)
+@Target({ElementType.METHOD, ElementType.TYPE})
+@Inherited
+public @interface StudioElement {
 
-    @StudioComponent(caption = "Table", icon = "table.svg")
-    interface Table {
-
-        @StudioProperty(id = "columns", type = PropertyType.ELEMENTS)
-        List<Column> getColumns();
-    }
-
-    @StudioElement(name = "column")
-    class Column {
-
-    }
+    String name();
 }

@@ -88,7 +88,7 @@ public class SimpleMetaBlueprint {
 
     }
 
-    @StudioComponent(caption = "GridLayout", tag = "grid", category = "Layout")
+    @StudioComponent(caption = "GridLayout", xmlTag = "grid", category = "Layout")
     private interface BGridLayout extends BLayout {
 
     }

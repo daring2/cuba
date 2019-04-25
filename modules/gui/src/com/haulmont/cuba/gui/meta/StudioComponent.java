@@ -16,40 +16,78 @@
 
 package com.haulmont.cuba.gui.meta;
 
+import com.haulmont.cuba.gui.components.Component;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * JavaDoc
+ * Indicates that the annotated UI component interface should be available in Studio Screen Designer. Provides metadata
+ * for UI components Palette and Properties Panel of Screen Designer. The annotated interface must be a direct or
+ * indirect subclass of {@link Component}.
  */
-@Retention(RetentionPolicy.SOURCE)
 @Documented
+@Retention(RetentionPolicy.SOURCE)
 public @interface StudioComponent {
+    /**
+     * @return caption in Studio Screen Designer Palette
+     */
     String caption() default "";
 
+    /**
+     * @return description of the component in Studio Screen Designer Palette
+     */
     String description() default "";
 
+    /**
+     * @return category of the component in Studio Screen Designer Palette, e.g.
+     */
     String category() default "";
 
+    /**
+     * @return UI components Palette icon, SVG or PNG
+     */
     String icon() default "";
 
-    String tag() default "";
+    /**
+     * @return XML tag of the component
+     */
+    String xmlTag() default "";
 
+    /**
+     * @return name of the default property, it will be automatically selected in Properties panel
+     */
     String defaultProperty() default "";
 
+    /**
+     * @return name of the default event, it will be used for scaffolding of the event handler on double click
+     */
     String defaultEvent() default "";
 
+    /**
+     * @return names of unsupported properties that should be hidden from Properties panel
+     */
     String[] unsupportedProperties() default {};
 
-    boolean container() default false;
+    /**
+     * @return UI component icon shown on canvas as a placeholder, if {@link #canvasBehaviour()} is
+     * {@link CanvasBehaviour#COMPONENT}. File should be in SVG or PNG format.
+     */
+    String canvasIcon() default "";
 
+    /**
+     * @return behaviour of UI component on Screen designer canvas
+     */
+    CanvasBehaviour canvasBehaviour() default CanvasBehaviour.COMPONENT;
+
+    /**
+     * @return type of container layout if {@link #canvasBehaviour()} is {@link CanvasBehaviour#CONTAINER}
+     */
     ContainerType containerType() default ContainerType.VERTICAL;
 
     /**
-     * JavaDoc
-     *
-     * todo extension point that can embed custom shortcuts to properties panel
+     * @return path to custom UI component designer script
      */
-    String designer() default "";
+    String designerScriptPath() default "";
 }

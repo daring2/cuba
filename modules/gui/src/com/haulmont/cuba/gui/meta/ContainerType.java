@@ -16,6 +16,9 @@
 
 package com.haulmont.cuba.gui.meta;
 
+/**
+ * JavaDoc
+ */
 public enum ContainerType {
     VERTICAL,
     HORIZONTAL,

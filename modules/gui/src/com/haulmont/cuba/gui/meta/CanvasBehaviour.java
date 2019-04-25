@@ -16,20 +16,24 @@
 
 package com.haulmont.cuba.gui.meta;
 
-import java.util.List;
+/**
+ * Behaviour of UI component on Studio Screen Designer canvas.
+ *
+ * @see StudioComponent
+ */
+public enum CanvasBehaviour {
+    /**
+     * JavaDoc
+     */
+    COMPONENT,
 
-@SuppressWarnings("unused")
-public class TableMetaBlueprint {
+    /**
+     * JavaDoc
+     */
+    INPUT_FIELD,
 
-    @StudioComponent(caption = "Table", icon = "table.svg")
-    interface Table {
-
-        @StudioProperty(id = "columns", type = PropertyType.ELEMENTS)
-        List<Column> getColumns();
-    }
-
-    @StudioElement(name = "column")
-    class Column {
-
-    }
+    /**
+     * JavaDoc
+     */
+    CONTAINER
 }
