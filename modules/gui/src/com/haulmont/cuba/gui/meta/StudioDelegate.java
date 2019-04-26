@@ -19,16 +19,25 @@ package com.haulmont.cuba.gui.meta;
 import java.lang.annotation.*;
 
 /**
- * JavaDoc
+ * Indicates that the annotated method should be shown in Studio Screen Designer as UI component delegate.
  */
 @Documented
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.METHOD)
 public @interface StudioDelegate {
 
+    /**
+     * @return caption of the delegate property in Screen Designer Properties
+     */
     String caption() default "";
 
+    /**
+     * @return description of the delegate property in Screen Designer Properties
+     */
     String description() default "";
 
+    /**
+     * @return category of the property in Properties Panel, e.g. General, Size, Data
+     */
     String category() default "";
 }

@@ -19,15 +19,20 @@ package com.haulmont.cuba.gui.meta;
 import java.lang.annotation.*;
 
 /**
- * JavaDoc
+ * Defines additional XML properties and property groups of a UI component.
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.SOURCE)
 @Inherited
 public @interface StudioProperties {
 
-    // todo list of virtual XML-only properties of a Component
+    /**
+     * @return UI component properties
+     */
     StudioProperty[] properties() default {};
 
-    PropertiesRule[] rules() default {};
+    /**
+     * @return groups of properties
+     */
+    PropertiesGroup[] groups() default {};
 }

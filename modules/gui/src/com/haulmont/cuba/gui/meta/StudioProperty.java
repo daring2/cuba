@@ -19,32 +19,59 @@ package com.haulmont.cuba.gui.meta;
 import java.lang.annotation.*;
 
 /**
- * JavaDoc
+ * Indicates that the annotated method should be shown in Studio Screen Designer as UI component property.
  */
 @Documented
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.METHOD)
 public @interface StudioProperty {
-    String id() default "";
-
-    PropertyType type() default PropertyType.AUTO;
-
-    String caption() default "";
-
-    String description() default "";
-
-    String category() default "";
-
-    boolean required() default false;
-
-    String defaultValue() default "";
-
-    String xmlAttribute() default "";
-
-    String xmlElement() default "";
+    /**
+     * @return name of the property
+     */
+    String name() default "";
 
     /**
-     * todo path to custom designer script
+     * @return type of property
      */
-    String designer() default "";
+    PropertyType type() default PropertyType.AUTO;
+
+    /**
+     * @return caption of the property in Screen Designer Properties
+     */
+    String caption() default "";
+
+    /**
+     * @return description of the property in Screen Designer Properties
+     */
+    String description() default "";
+
+    /**
+     * @return category of the property in Properties Panel, e.g. General, Size, Data
+     */
+    String category() default "";
+
+    /**
+     * @return true if the property is required for component definition in XML
+     */
+    boolean required() default false;
+
+    /**
+     * @return default value of the property that can be safely omitted from XML
+     */
+    String defaultValue() default "";
+
+    /**
+     * @return enumeration options
+     */
+    String[] options() default {};
+
+    /**
+     * @return target XML attribute name, if not set then equal to name of the property
+     */
+    String xmlAttribute() default "";
+
+    /**
+     * @return target XML element name
+     */
+    String xmlElement() default "";
 }

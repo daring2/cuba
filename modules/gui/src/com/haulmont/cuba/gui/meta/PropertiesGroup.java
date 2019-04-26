@@ -19,13 +19,19 @@ package com.haulmont.cuba.gui.meta;
 import java.lang.annotation.*;
 
 /**
- * JavaDoc
+ * Defines a property group: list of dependent properties that must be used only together or mutually exclusive.
  */
 @Inherited
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)
-public @interface PropertiesRule {
-    PropertiesMode mode();
+public @interface PropertiesGroup {
+    /**
+     * @return group constraint
+     */
+    PropertiesConstraint constraint();
 
+    /**
+     * @return property names
+     */
     String[] properties();
 }

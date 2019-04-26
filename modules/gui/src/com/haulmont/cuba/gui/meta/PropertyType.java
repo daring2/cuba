@@ -16,44 +16,138 @@
 
 package com.haulmont.cuba.gui.meta;
 
+import com.haulmont.chile.core.datatypes.Datatype;
+import com.haulmont.cuba.gui.icons.CubaIcon;
+
 /**
- * JavaDoc
+ * Type of UI component property.
  */
 public enum PropertyType {
+    /**
+     * Infer type using parameter of the annotated method.
+     */
     AUTO,
 
+    /**
+     * Integer type.
+     */
     INTEGER,
+    /**
+     * Long type.
+     */
     LONG,
+    /**
+     * Double type.
+     */
     DOUBLE,
+    /**
+     * String type.
+     */
     STRING,
+    /**
+     * Boolean type.
+     */
     BOOLEAN,
+    /**
+     * Char type.
+     */
     CHARACTER,
 
-    COMPONENT_ID,
-    ALIGN,
-    ICON_ID,
-    SIZE,
-    LOCALIZED_STRING,
-    JPA_QUERY,
-
-    ENTITY_NAME,
-    JAVA_CLASS_NAME,
-
-    CSS_CLASSNAME_LIST,
-    CSS_BLOCK,
-
-    BEAN_REF,
-    DATASOURCE_REF,
-    CONTAINER_REF,
-    COLLECTION_CONTAINER_REF,
-    PROPERTY_REF,
-    PROPERTY_PATH_REF,
-    DATATYPE_ID,
-
+    /**
+     * Date in standard format: YYYY-MM-DD
+     */
     DATE,
+    /**
+     * Date with time in standard format: YYYY-MM-DD hh:mm:ss
+     */
     DATE_TIME,
+    /**
+     * Time in standard format: hh:mm:ss
+     */
     TIME,
 
-    // like columns, fields, etc
+    /**
+     * Value from the property options.
+     */
+    ENUMERATION,
+
+    /**
+     * Identifier of a component, action or sub part. Must be a valid Java identifier.
+     */
+    COMPONENT_ID,
+    /**
+     * Icon path or ID of icon from predefined CUBA icons.
+     *
+     * @see CubaIcon
+     */
+    ICON_ID,
+    /**
+     * Size value, e.g. width or height
+     */
+    SIZE,
+    /**
+     * String value or message key with msg:// or mainMsg:// prefix.
+     */
+    LOCALIZED_STRING,
+    /**
+     * JPA QL string.
+     */
+    JPA_QUERY,
+    /**
+     * Name of Entity meta class.
+     */
+    ENTITY_NAME,
+    /**
+     * FQN of Java class.
+     */
+    JAVA_CLASS_NAME,
+
+    /**
+     * CSS classes separated with space symbol.
+     */
+    CSS_CLASSNAME_LIST,
+    /**
+     * Inline CSS properties.
+     */
+    CSS_BLOCK,
+
+    /**
+     * Spring Bean ID.
+     */
+    BEAN_REF,
+    /**
+     * ID of a datasource.
+     */
+    DATASOURCE_REF,
+    /**
+     * ID of a data loader.
+     */
+    DATALOADER_REF,
+    /**
+     * ID of a data container
+     */
+    DATACONTAINER_REF,
+    /**
+     * ID of a collection data container.
+     */
+    COLLECTION_DATACONTAINER_REF,
+    /**
+     * Name of a data model property.
+     */
+    PROPERTY_REF,
+    /**
+     * Entity property path.
+     */
+    PROPERTY_PATH_REF,
+    /**
+     * ID of a datatype.
+     *
+     * @see Datatype
+     */
+    DATATYPE_ID,
+
+    /**
+     * Nested elements of UI component, e.g. columns, actions, fields
+     */
     ELEMENTS
 }

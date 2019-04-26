@@ -16,13 +16,44 @@
 
 package com.haulmont.cuba.gui.meta;
 
+import com.haulmont.cuba.gui.components.*;
+
 /**
- * JavaDoc
+ * Specifies standard container type for emulation in Studio Screen Designer.
  */
 public enum ContainerType {
+    /**
+     * Vertical layout.
+     *
+     * @see VBoxLayout
+     */
     VERTICAL,
+
+    /**
+     * Horizontal layout.
+     *
+     * @see HBoxLayout
+     */
     HORIZONTAL,
+
+    /**
+     * CSS layout.
+     *
+     * @see CssLayout
+     */
     CSS,
+
+    /**
+     * Directional flow layout.
+     *
+     * @see FlowBoxLayout
+     */
     FLOW,
+
+    /**
+     * Grid layout.
+     *
+     * @see GridLayout
+     */
     GRID
 }

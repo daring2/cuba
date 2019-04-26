@@ -24,11 +24,11 @@ public class TableMetaBlueprint {
     @StudioComponent(caption = "Table", icon = "table.svg")
     interface Table {
 
-        @StudioProperty(id = "columns", type = PropertyType.ELEMENTS)
+        @StudioProperty(name = "columns", type = PropertyType.ELEMENTS)
         List<Column> getColumns();
     }
 
-    @StudioElement(name = "column")
+    @StudioElement("column")
     class Column {
 
     }

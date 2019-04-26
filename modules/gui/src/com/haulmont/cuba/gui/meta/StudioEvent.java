@@ -19,16 +19,26 @@ package com.haulmont.cuba.gui.meta;
 import java.lang.annotation.*;
 
 /**
- * JavaDoc
+ * Indicates that the annotated method should be shown in Studio Screen Designer as UI component event. <br>
+ * Annotated methods must be named as {@code addSomeListener} and have ony one parameter with type of the event.
  */
 @Documented
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.METHOD)
 public @interface StudioEvent {
 
+    /**
+     * @return caption of the event in Screen Designer Events
+     */
     String caption() default "";
 
+    /**
+     * @return description of the event in Screen Designer Events
+     */
     String description() default "";
 
+    /**
+     * @return category of the event in Screen Designer Events, e.g. Data, Interaction, Lifecycle
+     */
     String category() default "";
 }

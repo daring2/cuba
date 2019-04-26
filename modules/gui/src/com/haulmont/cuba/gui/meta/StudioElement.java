@@ -19,12 +19,15 @@ package com.haulmont.cuba.gui.meta;
 import java.lang.annotation.*;
 
 /**
- * JavaDoc
+ * Specifies name of XML element for parts of UI component, e.g. column, action, field, etc.
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Inherited
 public @interface StudioElement {
 
-    String name();
+    /**
+     * @return name of the corresponding XML element
+     */
+    String value();
 }

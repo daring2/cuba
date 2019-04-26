@@ -17,9 +17,16 @@
 package com.haulmont.cuba.gui.meta;
 
 /**
- * JavaDoc
+ * Specifies behaviour of properties in group.
  */
-public enum PropertiesMode {
+public enum PropertiesConstraint {
+    /**
+     * Properties in group are mutually exclusive.
+     */
     ONE_OF,
-    ALL
+
+    /**
+     * All properties of group must be specified.
+     */
+    ALL_OR_NOTHING
 }

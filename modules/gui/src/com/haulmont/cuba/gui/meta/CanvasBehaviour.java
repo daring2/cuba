@@ -23,17 +23,17 @@ package com.haulmont.cuba.gui.meta;
  */
 public enum CanvasBehaviour {
     /**
-     * JavaDoc
+     * Component is shown on canvas as a simple box with icon.
      */
     COMPONENT,
 
     /**
-     * JavaDoc
+     * Component is shown on canvas as an input field.
      */
     INPUT_FIELD,
 
     /**
-     * JavaDoc
+     * Component is shown on canvas as a component container.
      */
     CONTAINER
 }

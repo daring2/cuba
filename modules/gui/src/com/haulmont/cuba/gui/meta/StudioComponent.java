@@ -41,7 +41,7 @@ public @interface StudioComponent {
     String description() default "";
 
     /**
-     * @return category of the component in Studio Screen Designer Palette, e.g.
+     * @return category of the component in Studio Screen Designer Palette, e.g. Containers, Components, Fields
      */
     String category() default "";
 
@@ -85,9 +85,4 @@ public @interface StudioComponent {
      * @return type of container layout if {@link #canvasBehaviour()} is {@link CanvasBehaviour#CONTAINER}
      */
     ContainerType containerType() default ContainerType.VERTICAL;
-
-    /**
-     * @return path to custom UI component designer script
-     */
-    String designerScriptPath() default "";
 }

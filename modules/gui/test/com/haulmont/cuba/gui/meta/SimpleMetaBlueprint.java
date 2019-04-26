@@ -28,7 +28,7 @@ import static com.haulmont.cuba.gui.meta.PropertyType.*;
 public class SimpleMetaBlueprint {
 
     @StudioProperties(properties = {
-            @StudioProperty(id = "css", category = "CSS", type = CSS_BLOCK)
+            @StudioProperty(name = "css", category = "CSS", type = CSS_BLOCK)
     })
     private interface BComponent {
         @StudioProperty(type = CSS_CLASSNAME_LIST)
@@ -54,16 +54,16 @@ public class SimpleMetaBlueprint {
     private interface BLabel {
     }
 
-    @StudioComponent(caption = "TextField", category = "Input")
-    @StudioProperties(rules = {
-            @PropertiesRule(mode = PropertiesMode.ONE_OF, properties = {"container", "datasource"}),
-            @PropertiesRule(mode = PropertiesMode.ALL, properties = {"container", "property"})
+    @StudioComponent(caption = "TextField", category = "Fields")
+    @StudioProperties(groups = {
+            @PropertiesGroup(constraint = PropertiesConstraint.ONE_OF, properties = {"container", "datasource"}),
+            @PropertiesGroup(constraint = PropertiesConstraint.ALL_OR_NOTHING, properties = {"container", "property"})
     })
     private interface BTextField {
 
         @StudioProperties(properties = {
-                @StudioProperty(id = "container", caption = "Container", type = CONTAINER_REF),
-                @StudioProperty(id = "property", caption = "Property", type = PROPERTY_PATH_REF)
+                @StudioProperty(name = "container", caption = "Container", type = DATACONTAINER_REF),
+                @StudioProperty(name = "property", caption = "Property", type = PROPERTY_PATH_REF)
         })
         void setValueSource(ValueSource valueSource);
     }
@@ -82,7 +82,7 @@ public class SimpleMetaBlueprint {
 
     @StudioComponent(defaultEvent = "layoutClick")
     @StudioProperties(properties = {
-            @StudioProperty(id = "width", defaultValue = "100%")
+            @StudioProperty(name = "width", defaultValue = "100%")
     })
     private interface BVerticalLayout extends BLayout {
 
