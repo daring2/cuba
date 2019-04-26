@@ -5,8 +5,9 @@
 
 package com.haulmont.cuba.gui.components.validation;
 
-import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.BeanLocator;
 import com.haulmont.cuba.core.global.DateTimeTransformations;
+import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.components.ValidationException;
 import com.haulmont.cuba.gui.components.validation.time.TimeValidator;
 import org.dom4j.Element;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
 import java.time.*;
 import java.util.Date;
 
@@ -27,20 +29,18 @@ import java.util.Date;
  * <pre>
  *    &lt;bean id="cuba_FutureOrPresentValidator" class="com.haulmont.cuba.gui.components.validation.FutureOrPresentValidator" scope="prototype"/&gt;
  *    </pre>
- * Use {@code create()} static methods instead of constructors when creating the action programmatically.
+ * Use {@link BeanLocator} when creating the validator programmatically.
  *
  * @param <T> {@link Date}, {@link LocalDate}, {@link LocalDateTime}, {@link LocalTime}, {@link OffsetDateTime},
  *            {@link OffsetTime}
  */
-@Component(FutureOrPresentValidator.NAME)
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Component(FutureOrPresentValidator.NAME)
 public class FutureOrPresentValidator<T> extends AbstractValidator<T> {
 
     public static final String NAME = "cuba_FutureOrPresentValidator";
 
     protected boolean checkSeconds = false;
-
-    protected String defaultMessage = messages.getMainMessage("validation.constraints.futureOrPresent");
 
     public FutureOrPresentValidator() {
     }
@@ -60,7 +60,7 @@ public class FutureOrPresentValidator<T> extends AbstractValidator<T> {
      */
     public FutureOrPresentValidator(Element element, String messagePack) {
         this.messagePack = messagePack;
-        this.message = loadMessage(element);
+        this.message = element.attributeValue("message");
 
         String checkSeconds = element.attributeValue("checkSeconds");
         if (checkSeconds != null) {
@@ -68,49 +68,18 @@ public class FutureOrPresentValidator<T> extends AbstractValidator<T> {
         }
     }
 
-    /**
-     * Creates validator with default error message.
-     *
-     * @param <T> {@link Date}, {@link LocalDate}, {@link LocalDateTime}, {@link LocalTime}, {@link OffsetDateTime},
-     *            {@link OffsetTime}
-     * @return validator
-     */
-    public static <T> FutureOrPresentValidator<T> create() {
-        return AppBeans.getPrototype(NAME);
-    }
-
-    /**
-     * Constructor for custom error message.
-     *
-     * @param message error message
-     * @param <T>     {@link Date}, {@link LocalDate}, {@link LocalDateTime}, {@link LocalTime}, {@link OffsetDateTime},
-     *                {@link OffsetTime}
-     * @return validator
-     */
-    public static <T> FutureOrPresentValidator<T> create(String message) {
-        return AppBeans.getPrototype(NAME, message);
-    }
-
-    /**
-     * @param element     'futureOrPresent' element
-     * @param messagePack message pack
-     * @param <T>         {@link Date}, {@link LocalDate}, {@link LocalDateTime}, {@link LocalTime}, {@link OffsetDateTime},
-     *                    {@link OffsetTime}
-     * @return validator
-     */
-    public static <T> FutureOrPresentValidator<T> create(Element element, String messagePack) {
-        return AppBeans.getPrototype(NAME, element, messagePack);
+    @Inject
+    public void setMessages(Messages messages) {
+        this.messages = messages;
     }
 
     /**
      * Set true if validator should also check seconds and nanos (if supported) in value. Default value is false.
      *
      * @param checkSeconds check seconds
-     * @return current instance
      */
-    public FutureOrPresentValidator<T> withCheckSeconds(boolean checkSeconds) {
+    public void setCheckSeconds(boolean checkSeconds) {
         this.checkSeconds = checkSeconds;
-        return this;
     }
 
     /**
@@ -118,11 +87,6 @@ public class FutureOrPresentValidator<T> extends AbstractValidator<T> {
      */
     public boolean isCheckSeconds() {
         return checkSeconds;
-    }
-
-    @Override
-    public String getDefaultMessage() {
-        return defaultMessage;
     }
 
     @Override
@@ -139,7 +103,12 @@ public class FutureOrPresentValidator<T> extends AbstractValidator<T> {
 
         timeConstraint.setCheckSeconds(checkSeconds);
         if (!timeConstraint.isFutureOrPresent()) {
-            throw new ValidationException(getErrorMessage());
+            String message = loadMessage();
+            if (message == null) {
+                message = messages.getMainMessage("validation.constraints.futureOrPresent");
+            }
+
+            throw new ValidationException(message);
         }
     }
 }

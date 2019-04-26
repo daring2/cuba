@@ -5,11 +5,13 @@
 
 package com.haulmont.cuba.gui.components.validation;
 
+import com.google.common.base.Strings;
 import com.haulmont.bali.util.ParamsMap;
-import com.haulmont.bali.util.Preconditions;
 import com.haulmont.chile.core.datatypes.Datatype;
 import com.haulmont.chile.core.datatypes.Datatypes;
 import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.BeanLocator;
+import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.core.global.UserSessionSource;
 import com.haulmont.cuba.gui.components.ValidationException;
 import com.haulmont.cuba.gui.components.validation.numbers.NumberValidator;
@@ -18,6 +20,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.Locale;
@@ -34,7 +37,7 @@ import static com.haulmont.cuba.gui.components.validation.ValidatorHelper.getNum
  * <pre>
  *   &lt;bean id="cuba_DecimalMinValidator" class="com.haulmont.cuba.gui.components.validation.DecimalMinValidator" scope="prototype"/&gt;
  *   </pre>
- * Use {@code create()} static methods instead of constructors when creating the action programmatically.
+ * Use {@link BeanLocator} when creating the validator programmatically.
  *
  * @param <T> BigDecimal, BigInteger, Long, Integer and String that represents BigDecimal value with current locale
  */
@@ -49,15 +52,13 @@ public class DecimalMinValidator<T> extends AbstractValidator<T> {
     protected BigDecimal min;
     protected boolean inclusive = true;
 
-    protected String defaultMessage = messages.getMainMessage("validation.constraints.decimalMinInclusive");
-
     /**
      * Constructor with default error message.
      *
-     * @param min representation of the min value according to the {@link BigDecimal} string representation.
+     * @param min min value
      */
-    public DecimalMinValidator(String min) {
-        this.min = new BigDecimal(min);
+    public DecimalMinValidator(BigDecimal min) {
+        this.min = min;
     }
 
     /**
@@ -65,11 +66,11 @@ public class DecimalMinValidator<T> extends AbstractValidator<T> {
      * <p>
      * Example: "Value '$value' should be greater than or equal to '$min'".
      *
-     * @param min     representation of the min value according to the {@link BigDecimal} string representation.
+     * @param min     min value
      * @param message error message
      */
-    public DecimalMinValidator(String min, String message) {
-        this.min = new BigDecimal(min);
+    public DecimalMinValidator(BigDecimal min, String message) {
+        this.min = min;
         this.message = message;
     }
 
@@ -79,68 +80,36 @@ public class DecimalMinValidator<T> extends AbstractValidator<T> {
      */
     public DecimalMinValidator(Element element, String messagePack) {
         this.messagePack = messagePack;
-        this.message = loadMessage(element);
+        this.message = element.attributeValue("message");
 
         String min = element.attributeValue("value");
-        Preconditions.checkNotNullArgument(min);
+        if (Strings.isNullOrEmpty(min)) {
+            throw new IllegalArgumentException("Min value is not defined");
+        }
         this.min = new BigDecimal(min);
 
         String inclusive = element.attributeValue("inclusive");
         if (inclusive != null) {
             this.inclusive = Boolean.parseBoolean(inclusive);
         }
-
-        setDefaultMessageInclusive(this.inclusive);
     }
 
-    /**
-     * Creates validator with default error message.
-     *
-     * @param min representation of the min value according to the {@link BigDecimal} string representation.
-     * @param <T> BigDecimal, BigInteger, Long, Integer and String that represents BigDecimal value with current locale
-     * @return validator
-     */
-    public static <T> DecimalMinValidator<T> create(String min) {
-        return AppBeans.getPrototype(NAME, min);
-    }
-
-    /**
-     * Creates validator with custom error message. This message can contain '$value', and '$min' keys for formatted output.
-     * <p>
-     * Example: "Value '$value' should be greater than or equal to '$min'".
-     *
-     * @param min     representation of the min value according to the {@link BigDecimal} string representation.
-     * @param message error message
-     * @param <T>     BigDecimal, BigInteger, Long, Integer and String that represents BigDecimal value with current locale
-     * @return validator
-     */
-    public static <T> DecimalMinValidator<T> create(String min, String message) {
-        return AppBeans.getPrototype(NAME, min, message);
-    }
-
-    /**
-     * @param element     decimalMin element
-     * @param messagePack message pack
-     * @param <T>         BigDecimal, BigInteger, Long, Integer and String that represents BigDecimal value with current locale
-     * @return validator
-     */
-    public static <T> DecimalMinValidator<T> create(Element element, String messagePack) {
-        return AppBeans.getPrototype(NAME, element, messagePack);
+    @Inject
+    public void setMessages(Messages messages) {
+        this.messages = messages;
     }
 
     /**
      * Sets min value.
      *
-     * @param min representation of the min value according to the {@link BigDecimal} string representation.
-     * @return current instance
+     * @param min min value
      */
-    public DecimalMinValidator<T> withMin(String min) {
-        this.min = new BigDecimal(min);
-        return this;
+    public void setMin(BigDecimal min) {
+        this.min = min;
     }
 
     /**
-     * @return representation of the min value according to the {@link BigDecimal} string representation.
+     * @return min value
      */
     public BigDecimal getMin() {
         return min;
@@ -149,31 +118,21 @@ public class DecimalMinValidator<T> extends AbstractValidator<T> {
     /**
      * Sets min value and inclusive option.
      *
-     * @param min       representation of the min value according to the {@link BigDecimal} string representation
+     * @param min       min value
      * @param inclusive inclusive option
-     * @return current instance
      */
-    public DecimalMinValidator<T> withMin(String min, boolean inclusive) {
-        this.min = new BigDecimal(min);
+    public void setMin(BigDecimal min, boolean inclusive) {
+        this.min = min;
         this.inclusive = inclusive;
-
-        setDefaultMessageInclusive(inclusive);
-
-        return this;
     }
 
     /**
      * Set to true if the value must be greater than or equal to the specified minimum. Default value is true.
      *
      * @param inclusive inclusive option
-     * @return current instance
      */
-    public DecimalMinValidator<T> withInclusive(boolean inclusive) {
+    public void setInclusive(boolean inclusive) {
         this.inclusive = inclusive;
-
-        setDefaultMessageInclusive(inclusive);
-
-        return this;
     }
 
     /**
@@ -181,11 +140,6 @@ public class DecimalMinValidator<T> extends AbstractValidator<T> {
      */
     public boolean isInclusive() {
         return inclusive;
-    }
-
-    @Override
-    public String getDefaultMessage() {
-        return defaultMessage;
     }
 
     @Override
@@ -205,7 +159,7 @@ public class DecimalMinValidator<T> extends AbstractValidator<T> {
                 Locale locale = userSessionSource.getUserSession().getLocale();
                 BigDecimal bigDecimal = (BigDecimal) datatype.parse((String) value, locale);
                 if (bigDecimal == null) {
-                    throw new ValidationException(getTemplateErrorMessage(ParamsMap.of("value", value, "min", min)));
+                    fireValidationException(value);
                 }
                 constraint = getNumberConstraint(bigDecimal);
             } catch (ParseException e) {
@@ -220,15 +174,22 @@ public class DecimalMinValidator<T> extends AbstractValidator<T> {
         }
 
         if (!constraint.isDecimalMin(min, inclusive)) {
-            throw new ValidationException(getTemplateErrorMessage(ParamsMap.of("value", value, "min", min)));
+            fireValidationException(value);
         }
     }
 
-    protected void setDefaultMessageInclusive(boolean inclusive) {
-        if (inclusive) {
-            defaultMessage = messages.getMainMessage("validation.constraints.decimalMinInclusive");
-        } else {
-            defaultMessage = messages.getMainMessage("validation.constraints.decimalMin");
-        }
+    protected String getDefaultMessage() {
+        return inclusive ?
+                messages.getMainMessage("validation.constraints.decimalMinInclusive")
+                : messages.getMainMessage("validation.constraints.decimalMin");
+    }
+
+    protected void fireValidationException(T value) {
+        String message = loadMessage();
+        String formattedMessage = getTemplateErrorMessage(
+                message == null ? getDefaultMessage() : message,
+                ParamsMap.of("value", value, "min", min));
+
+        throw new ValidationException(formattedMessage);
     }
 }

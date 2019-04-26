@@ -24,7 +24,7 @@ import java.util.function.Consumer;
  */
 public abstract class AbstractValidator<T> implements Consumer<T> {
 
-    protected Messages messages = AppBeans.get(Messages.NAME);
+    protected Messages messages;
     protected GStringTemplateEngine engine = new GStringTemplateEngine();
 
     protected String messagePack;
@@ -49,24 +49,11 @@ public abstract class AbstractValidator<T> implements Consumer<T> {
     }
 
     /**
-     * @return default error message which is used if custom message is not defined
-     */
-    public abstract String getDefaultMessage();
-
-    /**
-     * @return default message if custom is not defined
-     */
-    protected String getErrorMessage() {
-        return Strings.isNullOrEmpty(message) ? getDefaultMessage() : message;
-    }
-
-    /**
-     * @param values values map
+     * @param errorMessage error message
+     * @param values       values map
      * @return message with inserted values
      */
-    protected String getTemplateErrorMessage(Map<String, Object> values) {
-        String errorMessage = getErrorMessage();
-
+    protected String getTemplateErrorMessage(String errorMessage, Map<String, Object> values) {
         if (!Strings.isNullOrEmpty(errorMessage)) {
             StringWriter writer = new StringWriter();
             try {
@@ -80,8 +67,7 @@ public abstract class AbstractValidator<T> implements Consumer<T> {
     }
 
     @Nullable
-    protected String loadMessage(Element element) {
-        String message = element.attributeValue("message");
+    protected String loadMessage() {
         if (!Strings.isNullOrEmpty(message)) {
 
             return !Strings.isNullOrEmpty(messagePack) ?

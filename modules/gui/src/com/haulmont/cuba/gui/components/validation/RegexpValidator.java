@@ -7,13 +7,15 @@ package com.haulmont.cuba.gui.components.validation;
 
 import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.bali.util.Preconditions;
-import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.BeanLocator;
+import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.components.ValidationException;
 import org.dom4j.Element;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
 import java.util.regex.Pattern;
 
 /**
@@ -28,19 +30,17 @@ import java.util.regex.Pattern;
  * <pre>
  *     &lt;bean id="cuba_RegexpValidator" class="com.haulmont.cuba.gui.components.validation.RegexpValidator" scope="prototype"/&gt;
  *     </pre>
- * Use {@code create()} static methods instead of constructors when creating the action programmatically.
+ * Use {@link BeanLocator} when creating the validator programmatically.
  *
  * @see java.util.regex.Pattern
  */
-@Component(RegexpValidator.NAME)
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Component(RegexpValidator.NAME)
 public class RegexpValidator extends AbstractValidator<String> {
 
     public static final String NAME = "cuba_RegexpValidator";
 
     protected Pattern pattern;
-    protected String defaultMessage = messages.getMainMessage("validation.constraints.regexp");
-
 
     public RegexpValidator(String regexp) {
         Preconditions.checkNotNullArgument(regexp);
@@ -68,49 +68,16 @@ public class RegexpValidator extends AbstractValidator<String> {
      */
     public RegexpValidator(Element element, String messagePack) {
         this.messagePack = messagePack;
-        this.message = loadMessage(element);
+        this.message = element.attributeValue("message");
 
         String regexp = element.attributeValue("regexp");
         Preconditions.checkNotNullArgument(regexp);
         this.pattern = Pattern.compile(regexp);
     }
 
-    /**
-     * Creates validator with default message.
-     *
-     * @param regexp regular expression
-     * @return validator
-     */
-    public static RegexpValidator create(String regexp) {
-        return AppBeans.getPrototype(NAME, regexp);
-    }
-
-    /**
-     * Creates validator with regexp value and custom error message. This message can contain '$value' key for
-     * formatted output.
-     * <p>
-     * Example: "Invalid value '$value'".
-     *
-     * @param regexp  regular expression
-     * @param message error message
-     * @return validator
-     */
-    public static RegexpValidator create(String regexp, String message) {
-        return AppBeans.getPrototype(NAME, regexp, message);
-    }
-
-    /**
-     * @param element     regexp element
-     * @param messagePack message pack
-     * @return validator
-     */
-    public static RegexpValidator create(Element element, String messagePack) {
-        return AppBeans.getPrototype(NAME, element, messagePack);
-    }
-
-    @Override
-    public String getDefaultMessage() {
-        return defaultMessage;
+    @Inject
+    public void setMessages(Messages messages) {
+        this.messages = messages;
     }
 
     @Override
@@ -120,7 +87,12 @@ public class RegexpValidator extends AbstractValidator<String> {
         }
 
         if (!pattern.matcher((value)).matches()) {
-            throw new ValidationException(getTemplateErrorMessage(ParamsMap.of("value", value)));
+            String message = loadMessage();
+            if (message == null) {
+                message = messages.getMainMessage("validation.constraints.regexp");
+            }
+
+            throw new ValidationException(getTemplateErrorMessage(message, ParamsMap.of("value", value)));
         }
     }
 }

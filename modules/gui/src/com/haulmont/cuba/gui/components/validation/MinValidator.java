@@ -5,15 +5,18 @@
 
 package com.haulmont.cuba.gui.components.validation;
 
+import com.google.common.base.Strings;
 import com.haulmont.bali.util.ParamsMap;
-import com.haulmont.bali.util.Preconditions;
-import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.BeanLocator;
+import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.components.ValidationException;
 import com.haulmont.cuba.gui.components.validation.numbers.NumberValidator;
 import org.dom4j.Element;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
 
 import static com.haulmont.cuba.gui.components.validation.ValidatorHelper.getNumberConstraint;
 
@@ -27,7 +30,7 @@ import static com.haulmont.cuba.gui.components.validation.ValidatorHelper.getNum
  * <pre>
  *    &lt;bean id="MinValidator" class="com.haulmont.cuba.gui.components.validation.MinValidator" scope="prototype"/&gt;
  *    </pre>
- * Use {@code create()} static methods instead of constructors when creating the action programmatically.
+ * Use {@link BeanLocator} when creating the validator programmatically.
  *
  * @param <T> BigDecimal, BigInteger, Long, Integer
  */
@@ -39,13 +42,6 @@ public class MinValidator<T extends Number> extends AbstractValidator<T> {
 
     protected long min;
 
-    protected String defaultMessage = messages.getMainMessage("validation.constraints.min");
-
-    /**
-     * Constructor with default error message.
-     *
-     * @param min min value
-     */
     public MinValidator(long min) {
         this.min = min;
     }
@@ -69,63 +65,27 @@ public class MinValidator<T extends Number> extends AbstractValidator<T> {
      */
     public MinValidator(Element element, String messagePack) {
         this.messagePack = messagePack;
-        this.message = loadMessage(element);
+        this.message = element.attributeValue("message");
 
         String min = element.attributeValue("value");
-        Preconditions.checkNotNullArgument(min);
+        if (Strings.isNullOrEmpty(messagePack)) {
+            throw new IllegalArgumentException("Min value is not defined");
+        }
         this.min = Long.parseLong(min);
     }
 
-    /**
-     * Creates validator with default error message.
-     *
-     * @param min min value
-     * @param <T> BigDecimal, BigInteger, Long, Integer
-     * @return validator
-     */
-    public static <T extends Number> MinValidator<T> create(long min) {
-        return AppBeans.getPrototype(NAME, min);
-    }
-
-    /**
-     * Creates validator with custom error message. This message can contain '$value' and '$min' keys for formatted
-     * output.
-     * <p>
-     * Example: "Value '$value' should be greater than or equal to '$min'".
-     *
-     * @param min     min value
-     * @param message error message
-     * @param <T>     BigDecimal, BigInteger, Long, Integer
-     * @return validator
-     */
-    public static <T extends Number> MinValidator<T> create(long min, String message) {
-        return AppBeans.getPrototype(NAME, min, message);
-    }
-
-    /**
-     * @param element     'min' element
-     * @param messagePack message pack
-     * @param <T>         BigDecimal, BigInteger, Long, Integer
-     * @return validator
-     */
-    public static <T extends Number> MinValidator<T> create(Element element, String messagePack) {
-        return AppBeans.getPrototype(NAME, element, messagePack);
+    @Inject
+    public void setMessages(Messages messages) {
+        this.messages = messages;
     }
 
     /**
      * Sets min value.
      *
      * @param min min value
-     * @return current instance
      */
-    public MinValidator<T> withMin(long min) {
+    public void setMin(long min) {
         this.min = min;
-        return this;
-    }
-
-    @Override
-    public String getDefaultMessage() {
-        return defaultMessage;
     }
 
     /**
@@ -150,7 +110,12 @@ public class MinValidator<T extends Number> extends AbstractValidator<T> {
         }
 
         if (!constraint.isMin(min)) {
-            throw new ValidationException(getTemplateErrorMessage(ParamsMap.of("value", value, "min", min)));
+            String message = loadMessage();
+            if (message == null) {
+                message = messages.getMainMessage("validation.constraints.min");
+            }
+
+            throw new ValidationException(getTemplateErrorMessage(message, ParamsMap.of("value", value, "min", min)));
         }
     }
 }

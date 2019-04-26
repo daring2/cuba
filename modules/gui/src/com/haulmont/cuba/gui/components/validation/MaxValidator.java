@@ -5,15 +5,18 @@
 
 package com.haulmont.cuba.gui.components.validation;
 
+import com.google.common.base.Strings;
 import com.haulmont.bali.util.ParamsMap;
-import com.haulmont.bali.util.Preconditions;
-import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.BeanLocator;
+import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.components.ValidationException;
 import com.haulmont.cuba.gui.components.validation.numbers.NumberValidator;
 import org.dom4j.Element;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
 
 import static com.haulmont.cuba.gui.components.validation.ValidatorHelper.getNumberConstraint;
 
@@ -27,7 +30,7 @@ import static com.haulmont.cuba.gui.components.validation.ValidatorHelper.getNum
  * <pre>
  *    &lt;bean id="cuba_MaxValidator" class="com.haulmont.cuba.gui.components.validation.MaxValidator" scope="prototype"/&gt;
  *    </pre>
- * Use {@code create()} static methods instead of constructors when creating the action programmatically.
+ * Use {@link BeanLocator} when creating the validator programmatically.
  *
  * @param <T> BigDecimal, BigInteger, Long, Integer
  */
@@ -39,13 +42,6 @@ public class MaxValidator<T extends Number> extends AbstractValidator<T> {
 
     protected long max;
 
-    protected String defaultMessage = messages.getMainMessage("validation.constraints.max");
-
-    /**
-     * Constructor with default error message.
-     *
-     * @param max max value
-     */
     public MaxValidator(long max) {
         this.max = max;
     }
@@ -69,61 +65,23 @@ public class MaxValidator<T extends Number> extends AbstractValidator<T> {
      */
     public MaxValidator(Element element, String messagePack) {
         this.messagePack = messagePack;
-        this.message = loadMessage(element);
+        this.message = element.attributeValue("message");
 
         String value = element.attributeValue("value");
-        Preconditions.checkNotNullArgument(value);
+        if (Strings.isNullOrEmpty(value)) {
+            throw new IllegalArgumentException("Max value is not defined");
+        }
+
         this.max = Long.parseLong(value);
-    }
-
-    /**
-     * Creates validator with custom error message. This message can contain '$value' and '$max' keys for formatted
-     * output.
-     * <p>
-     * Example: "Value '$value' should be less than or equal to '$max'".
-     *
-     * @param max max value
-     * @param <T> BigDecimal, BigInteger, Long, Integer
-     * @return validator
-     */
-    public static <T extends Number> MaxValidator<T> create(long max) {
-        return AppBeans.getPrototype(NAME, max);
-    }
-
-    /**
-     * Creates validator with custom error message. This message can contain '$value' and '$max' keys for formatted
-     * output.
-     * <p>
-     * Example: "Value '$value' should be less than or equal to '$max'".
-     *
-     * @param max     max value
-     * @param message error message
-     * @param <T>     BigDecimal, BigInteger, Long, Integer
-     * @return validator
-     */
-    public static <T extends Number> MaxValidator<T> create(long max, String message) {
-        return AppBeans.getPrototype(NAME, max, message);
-    }
-
-    /**
-     * @param element     'max' element
-     * @param messagePack message pack
-     * @param <T>         BigDecimal, BigInteger, Long, Integer
-     * @return validator
-     */
-    public static <T extends Number> MaxValidator<T> create(Element element, String messagePack) {
-        return AppBeans.getPrototype(NAME, element, messagePack);
     }
 
     /**
      * Sets max value.
      *
      * @param max max value
-     * @return current instance
      */
-    public MaxValidator<T> withMax(long max) {
+    public void setMax(long max) {
         this.max = max;
-        return this;
     }
 
     /**
@@ -133,9 +91,9 @@ public class MaxValidator<T extends Number> extends AbstractValidator<T> {
         return max;
     }
 
-    @Override
-    public String getDefaultMessage() {
-        return defaultMessage;
+    @Inject
+    public void setMessages(Messages messages) {
+        this.messages = messages;
     }
 
     @Override
@@ -153,7 +111,12 @@ public class MaxValidator<T extends Number> extends AbstractValidator<T> {
         }
 
         if (!constraint.isMax(max)) {
-            throw new ValidationException(getTemplateErrorMessage(ParamsMap.of("value", value, "max", max)));
+            String message = loadMessage();
+            if (message == null) {
+                message = messages.getMainMessage("validation.constraints.max");
+            }
+
+            throw new ValidationException(getTemplateErrorMessage(message, ParamsMap.of("value", value, "max", max)));
         }
     }
 }

@@ -5,11 +5,13 @@
 
 package com.haulmont.cuba.gui.components.validation;
 
+import com.google.common.base.Strings;
 import com.haulmont.bali.util.ParamsMap;
-import com.haulmont.bali.util.Preconditions;
 import com.haulmont.chile.core.datatypes.Datatype;
 import com.haulmont.chile.core.datatypes.Datatypes;
 import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.BeanLocator;
+import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.core.global.UserSessionSource;
 import com.haulmont.cuba.gui.components.ValidationException;
 import com.haulmont.cuba.gui.components.validation.numbers.NumberValidator;
@@ -18,6 +20,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.Locale;
@@ -35,7 +38,7 @@ import static com.haulmont.cuba.gui.components.validation.ValidatorHelper.getNum
  * <pre>
  *    &lt;bean id="cuba_DigitsValidator" class="com.haulmont.cuba.gui.components.validation.DigitsValidator" scope="prototype"/&gt;
  *    </pre>
- * Use {@code create()} static methods instead of constructors when creating the action programmatically.
+ * Use {@link BeanLocator} when creating the validator programmatically.
  *
  * @param <T> BigDecimal, BigInteger, Long, Integer and String that represents BigDecimal value with current locale
  */
@@ -49,8 +52,6 @@ public class DigitsValidator<T> extends AbstractValidator<T> {
 
     protected int integer;
     protected int fraction;
-
-    protected String defaultMessage = messages.getMainMessage("validation.constraints.digits");
 
     /**
      * Constructor with default error message.
@@ -86,76 +87,42 @@ public class DigitsValidator<T> extends AbstractValidator<T> {
      */
     public DigitsValidator(Element element, String messagePack) {
         this.messagePack = messagePack;
-        this.message = loadMessage(element);
+        this.message = element.attributeValue("message");
 
         String integer = element.attributeValue("integer");
-        Preconditions.checkNotNullArgument(integer);
+        if (Strings.isNullOrEmpty(integer)) {
+            throw new IllegalArgumentException("Integer value is not defined");
+        }
         this.integer = Integer.parseInt(integer);
 
         String fraction = element.attributeValue("fraction");
-        Preconditions.checkNotNullArgument(fraction);
+        if (Strings.isNullOrEmpty(fraction)) {
+            throw new IllegalArgumentException("Fraction value is not defined");
+        }
         this.fraction = Integer.parseInt(fraction);
     }
 
-    /**
-     * Creates validator with default error message.
-     *
-     * @param integer  maximum number of integral digits
-     * @param fraction maximum number of fractional digits
-     * @param <T>      BigDecimal, BigInteger, Long, Integer and String that represents BigDecimal value with current locale
-     * @return validator
-     */
-    public static <T> DigitsValidator<T> create(int integer, int fraction) {
-        return AppBeans.getPrototype(NAME, integer, fraction);
-    }
-
-    /**
-     * Creates validator with custom error message. This message can contain '$value', '$integer' and '$fraction' keys for
-     * formatted output.
-     * <p>
-     * Example: "Value '$value' is out of bounds ($integer digits is expected in integer part and $fraction in
-     * fractional part)".
-     *
-     * @param integer  maximum number of integral digits
-     * @param fraction maximum number of fractional digits
-     * @param message  error message
-     * @param <T>      BigDecimal, BigInteger, Long, Integer and String that represents BigDecimal value with current locale
-     * @return validator
-     */
-    public static <T> DigitsValidator<T> create(int integer, int fraction, String message) {
-        return AppBeans.getPrototype(NAME, integer, fraction, message);
-    }
-
-    /**
-     * @param element     'digits' element
-     * @param messagePack message pack
-     * @param <T>         BigDecimal, BigInteger, Long, Integer and String that represents BigDecimal value with current locale
-     * @return validator
-     */
-    public static <T> DigitsValidator<T> create(Element element, String messagePack) {
-        return AppBeans.getPrototype(NAME, element, messagePack);
+    @Inject
+    public void setMessages(Messages messages) {
+        this.messages = messages;
     }
 
     /**
      * Sets maximum value inclusive.
      *
      * @param integer maximum number of integral digits
-     * @return current instance
      */
-    public DigitsValidator<T> withIntger(int integer) {
+    public void setIntger(int integer) {
         this.integer = integer;
-        return this;
     }
 
     /**
      * Sets maximum value inclusive.
      *
      * @param fraction maximum number of fractional digits
-     * @return current instance
      */
-    public DigitsValidator<T> withFraction(int fraction) {
+    public void setFraction(int fraction) {
         this.fraction = fraction;
-        return this;
     }
 
     /**
@@ -170,11 +137,6 @@ public class DigitsValidator<T> extends AbstractValidator<T> {
      */
     public int getFraction() {
         return fraction;
-    }
-
-    @Override
-    public String getDefaultMessage() {
-        return defaultMessage;
     }
 
     @Override
@@ -194,11 +156,7 @@ public class DigitsValidator<T> extends AbstractValidator<T> {
                 Locale locale = userSessionSource.getUserSession().getLocale();
                 BigDecimal bigDecimal = (BigDecimal) datatype.parse((String) value, locale);
                 if (bigDecimal == null) {
-                    throw new ValidationException(getTemplateErrorMessage(
-                            ParamsMap.of(
-                                    "value", value,
-                                    "integer", integer,
-                                    "fraction", fraction)));
+                    fireValidationException(value);
                 }
                 constraint = getNumberConstraint(bigDecimal);
             } catch (ParseException e) {
@@ -213,11 +171,21 @@ public class DigitsValidator<T> extends AbstractValidator<T> {
         }
 
         if (!constraint.isDigits(integer, fraction)) {
-            throw new ValidationException(getTemplateErrorMessage(
-                    ParamsMap.of(
-                            "value", value,
-                            "integer", integer,
-                            "fraction", fraction)));
+            fireValidationException(value);
         }
+    }
+
+    protected void fireValidationException(T value) {
+        String message = loadMessage();
+        if (message == null) {
+            message = messages.getMainMessage("validation.constraints.digits");
+        }
+
+        String formatMessage = getTemplateErrorMessage(message,
+                ParamsMap.of("value", value,
+                             "integer", integer,
+                             "fraction", fraction));
+
+        throw new ValidationException(formatMessage);
     }
 }

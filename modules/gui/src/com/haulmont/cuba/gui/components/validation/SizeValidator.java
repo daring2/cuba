@@ -6,14 +6,17 @@
 package com.haulmont.cuba.gui.components.validation;
 
 import com.haulmont.bali.util.ParamsMap;
-import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.BeanLocator;
+import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.components.ValidationException;
 import org.dom4j.Element;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Size validator is applicable for Collections and String values. It checks that value is in a specific range.
@@ -27,12 +30,12 @@ import java.util.Collection;
  * <pre>
  *     &lt;bean id="cuba_SizeValidator" class="com.haulmont.cuba.gui.components.validation.SizeValidator" scope="prototype"/&gt;
  *     </pre>
- * Use {@code create()} static methods instead of constructors when creating the action programmatically.
+ * Use {@link BeanLocator} when creating the validator programmatically.
  *
  * @param <T> Collection or String
  */
-@Component(SizeValidator.NAME)
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Component(SizeValidator.NAME)
 public class SizeValidator<T> extends AbstractValidator<T> {
 
     public static final String NAME = "cuba_SizeValidator";
@@ -40,7 +43,7 @@ public class SizeValidator<T> extends AbstractValidator<T> {
     protected int min;
     protected int max = Integer.MAX_VALUE;
 
-    protected String defaultMessage = messages.getMainMessage("validation.constraints.sizeRange");
+    protected String defaultMessage;
 
     public SizeValidator() {
     }
@@ -65,7 +68,7 @@ public class SizeValidator<T> extends AbstractValidator<T> {
      */
     public SizeValidator(Element element, String messagePack) {
         this.messagePack = messagePack;
-        this.message = loadMessage(element);
+        this.message = element.attributeValue("message");
 
         String min = element.attributeValue("min");
         if (min != null) {
@@ -77,40 +80,9 @@ public class SizeValidator<T> extends AbstractValidator<T> {
         }
     }
 
-    /**
-     * Creates validator with default message.
-     *
-     * @param <T> Collection or String
-     * @return validator
-     */
-    public static <T> SizeValidator<T> create() {
-        return AppBeans.getPrototype(NAME);
-    }
-
-    /**
-     * Creates validator with custom error message. This message can contain following keys formatted output:
-     * '$value', '$min', and '$max'.
-     * <p>
-     * Example: "The '$value' length must be between $min and $max".
-     * <p>
-     * Note, that message for Collection doesn't use '$value' key for output error message.
-     *
-     * @param message error message
-     * @param <T>     Collection or String
-     * @return validator
-     */
-    public static <T> SizeValidator<T> create(String message) {
-        return AppBeans.getPrototype(NAME, message);
-    }
-
-    /**
-     * @param element     size element
-     * @param messagePack message pack
-     * @param <T>         Collection or String
-     * @return validator
-     */
-    public static <T> SizeValidator<T> create(Element element, String messagePack) {
-        return AppBeans.getPrototype(NAME, element, messagePack);
+    @Inject
+    public void setMessages(Messages messages) {
+        this.messages = messages;
     }
 
     /**
@@ -124,13 +96,11 @@ public class SizeValidator<T> extends AbstractValidator<T> {
      * </pre>
      *
      * @param min min value
-     * @return current instance
      */
-    public SizeValidator<T> withMin(int min) {
+    public void setMin(int min) {
         checkPositiveValue(min, "Min value cannot be less then 0");
 
         this.min = min;
-        return this;
     }
 
     public int getMin() {
@@ -148,13 +118,11 @@ public class SizeValidator<T> extends AbstractValidator<T> {
      * </pre>
      *
      * @param max max value
-     * @return current instance
      */
-    public SizeValidator<T> withMax(int max) {
+    public void setMax(int max) {
         checkPositiveValue(min, "Max value cannot be less then 0");
 
         this.max = max;
-        return this;
     }
 
     /**
@@ -169,44 +137,43 @@ public class SizeValidator<T> extends AbstractValidator<T> {
      *
      * @param min min value
      * @param max max value
-     * @return current instance
      */
-    public SizeValidator<T> withSize(int min, int max) {
+    public void setSize(int min, int max) {
         checkPositiveValue(min, "Min value cannot be less then 0");
         checkPositiveValue(max, "Max value cannot be less then 0");
 
         this.min = min;
         this.max = max;
-        return this;
-    }
-
-    @Override
-    public String getDefaultMessage() {
-        return defaultMessage;
     }
 
     @Override
     public void accept(T value) throws ValidationException {
-        // consider that null value is in range
+        // consider null value is in range
         if (value == null) {
             return;
         }
 
+        String message = loadMessage();
         Class clazz = value.getClass();
         if (Collection.class.isAssignableFrom(clazz)) {
             int size = ((Collection) value).size();
             if (min > size || size > max) {
                 this.defaultMessage = messages.getMainMessage("validation.constraints.collectionSizeRange");
-                throw new ValidationException(getTemplateErrorMessage(ParamsMap.of("min", min, "max", max)));
+
+                fireValidationException(
+                        message == null ? defaultMessage : message,
+                        ParamsMap.of("min", min, "max", max));
             }
         } else if (clazz.equals(String.class)) {
             int length = ((String) value).length();
             if (min > length || length > max) {
-                throw new ValidationException(
-                        getTemplateErrorMessage(ParamsMap.of(
-                                "value", value,
+                this.defaultMessage = messages.getMainMessage("validation.constraints.sizeRange");
+
+                fireValidationException(
+                        message == null ? defaultMessage : message,
+                        ParamsMap.of("value", value,
                                 "min", min,
-                                "max", max)));
+                                "max", max));
             }
         }
     }
@@ -215,5 +182,9 @@ public class SizeValidator<T> extends AbstractValidator<T> {
         if (value < 0) {
             throw new IllegalArgumentException(message);
         }
+    }
+
+    protected void fireValidationException(String errorMessage, Map<String, Object> map) {
+        throw new ValidationException(getTemplateErrorMessage(errorMessage, map));
     }
 }

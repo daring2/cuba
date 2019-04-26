@@ -31,28 +31,28 @@ import java.util.function.BiFunction;
 
 public abstract class AbstractFieldLoader<T extends Field> extends AbstractDatasourceComponentLoader<T> {
 
-    protected static final Map<String, BiFunction<Element, String, AbstractValidator>> validatorsMap;
+    protected static final Map<String, String> validatorsMap;
 
     static {
-        Map<String, BiFunction<Element, String, AbstractValidator>> validators = new HashMap<>(18);
-        validators.put("decimalMin", DecimalMinValidator::create);
-        validators.put("decimalMax", DecimalMaxValidator::create);
-        validators.put("digits", DigitsValidator::create);
-        validators.put("futureOrPresent", FutureOrPresentValidator::create);
-        validators.put("future", FutureValidator::create);
-        validators.put("max", MaxValidator::create);
-        validators.put("min", MinValidator::create);
-        validators.put("negativeOrZero", NegativeOrZeroValidator::create);
-        validators.put("negative", NegativeValidator::create);
-        validators.put("notBlank", NotBlankValidator::create);
-        validators.put("notEmpty", NotEmptyValidator::create);
-        validators.put("notNull", NotNullValidator::create);
-        validators.put("pastOrPresent", PastOrPresentValidator::create);
-        validators.put("past", PastValidator::create);
-        validators.put("positiveOrZero", PositiveOrZeroValidator::create);
-        validators.put("positive", PositiveValidator::create);
-        validators.put("regexp", RegexpValidator::create);
-        validators.put("size", SizeValidator::create);
+        Map<String, String> validators = new HashMap<>(18);
+        validators.put("decimalMin", DecimalMinValidator.NAME);
+        validators.put("decimalMax", DecimalMaxValidator.NAME);
+        validators.put("digits", DigitsValidator.NAME);
+        validators.put("futureOrPresent", FutureOrPresentValidator.NAME);
+        validators.put("future", FutureValidator.NAME);
+        validators.put("max", MaxValidator.NAME);
+        validators.put("min", MinValidator.NAME);
+        validators.put("negativeOrZero", NegativeOrZeroValidator.NAME);
+        validators.put("negative", NegativeValidator.NAME);
+        validators.put("notBlank", NotBlankValidator.NAME);
+        validators.put("notEmpty", NotEmptyValidator.NAME);
+        validators.put("notNull", NotNullValidator.NAME);
+        validators.put("pastOrPresent", PastOrPresentValidator.NAME);
+        validators.put("past", PastValidator.NAME);
+        validators.put("positiveOrZero", PositiveOrZeroValidator.NAME);
+        validators.put("positive", PositiveValidator.NAME);
+        validators.put("regexp", RegexpValidator.NAME);
+        validators.put("size", SizeValidator.NAME);
         validatorsMap = Collections.unmodifiableMap(validators);
     }
 
@@ -129,9 +129,9 @@ public abstract class AbstractFieldLoader<T extends Field> extends AbstractDatas
             List<Element> validators = validatorsHolder.elements();
 
             for (Element validator : validators) {
-                BiFunction<Element, String, AbstractValidator> validatorLoader = validatorsMap.get(validator.getName());
-                if (validatorLoader != null) {
-                    component.addValidator(validatorLoader.apply(element, getMessagesPack()));
+                String beanName =  validatorsMap.get(validator.getName());
+                if (beanName != null) {
+                    component.addValidator(beanLocator.getPrototype(beanName, validator, getMessagesPack()));
                 } else if (validator.getName().equals("email")) {
                     component.addValidator(new EmailValidator(validator, getMessagesPack()));
                 }
