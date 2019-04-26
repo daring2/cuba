@@ -17,7 +17,7 @@
 package com.haulmont.cuba.gui.meta;
 
 /**
- * Specifies behaviour of properties in group.
+ * Specifies the behaviour of properties in group.
  */
 public enum PropertiesConstraint {
     /**
@@ -26,7 +26,7 @@ public enum PropertiesConstraint {
     ONE_OF,
 
     /**
-     * All properties of group must be specified.
+     * All properties of group or none of them must be set.
      */
     ALL_OR_NOTHING
 }
