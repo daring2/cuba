@@ -16,6 +16,7 @@
 
 package com.haulmont.cuba.web.toolkit.ui;
 
+import com.haulmont.cuba.web.toolkit.ui.client.datepicker.CubaDatePickerState;
 import com.vaadin.ui.InlineDateField;
 
 public class CubaDatePicker extends InlineDateField {
@@ -23,5 +24,18 @@ public class CubaDatePicker extends InlineDateField {
     public CubaDatePicker() {
         setValidationVisible(false);
         setShowBufferedSourceException(false);
+    }
+
+    public void setTextualRangeStart(String rangeStart) {
+        getState().textualRangeStart = rangeStart;
+    }
+
+    public void setTextualRangeEnd(String rangeEnd) {
+        getState().textualRangeEnd = rangeEnd;
+    }
+
+    @Override
+    protected CubaDatePickerState getState() {
+        return (CubaDatePickerState) super.getState();
     }
 }
