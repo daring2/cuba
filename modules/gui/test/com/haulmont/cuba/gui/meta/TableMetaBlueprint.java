@@ -24,7 +24,7 @@ public class TableMetaBlueprint {
     @StudioComponent(caption = "Table", icon = "table.svg")
     interface Table {
 
-        @StudioProperty(name = "columns", type = PropertyType.ELEMENTS)
+        @StudioProperty(name = "columns", type = PropertyType.ELEMENTS_GROUP)
         List<Column> getColumns();
     }
 
