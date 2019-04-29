@@ -35,7 +35,6 @@ import com.haulmont.cuba.web.gui.data.ItemWrapper;
 import com.haulmont.cuba.web.gui.data.PropertyWrapper;
 import com.haulmont.cuba.web.toolkit.ui.CubaDatePicker;
 import com.vaadin.ui.InlineDateField;
-import org.apache.commons.lang3.time.FastDateFormat;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.Past;
@@ -55,8 +54,6 @@ public class WebDatePicker extends WebAbstractField<InlineDateField> implements 
 
     protected Datasource.ItemChangeListener itemChangeListener;
     protected WeakItemChangeListener weakItemChangeListener;
-
-    protected static final FastDateFormat RANGE_FORMATTER = FastDateFormat.getInstance("yyyy/MM/dd HH:mm:ss");
 
     public WebDatePicker() {
         this.component = new CubaDatePicker();
@@ -316,8 +313,6 @@ public class WebDatePicker extends WebAbstractField<InlineDateField> implements 
     @Override
     public void setRangeStart(Date rangeStart) {
         component.setRangeStart(rangeStart);
-
-        ((CubaDatePicker) component).setTextualRangeStart(RANGE_FORMATTER.format(rangeStart));
     }
 
     @Override
@@ -328,8 +323,6 @@ public class WebDatePicker extends WebAbstractField<InlineDateField> implements 
     @Override
     public void setRangeEnd(Date rangeEnd) {
         component.setRangeEnd(rangeEnd);
-
-        ((CubaDatePicker) component).setTextualRangeEnd(RANGE_FORMATTER.format(rangeEnd));
     }
 
     @SuppressWarnings("unchecked")

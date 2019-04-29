@@ -42,6 +42,9 @@ public class CubaDateFieldConnector extends PopupDateFieldConnector {
     public void onStateChanged(StateChangeEvent stateChangeEvent) {
         super.onStateChanged(stateChangeEvent);
         getWidget().getImpl().setMask(getState().dateMask);
+
+        getWidget().setTextualRangeStart(getState().textualRangeStart);
+        getWidget().setTextualRangeEnd(getState().textualRangeEnd);
     }
 
     @Override
