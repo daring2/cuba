@@ -31,7 +31,7 @@ public interface TransactionalActionFactory {
      * Creates instance of {@link com.haulmont.cuba.core.global.TransactionalAction}.
      * @param supplier  defines how to retrieve {@link com.haulmont.cuba.core.global.CommitContext}
      * @return          instance of {@link com.haulmont.cuba.core.global.TransactionalAction} without any additional
-     *                  actions ({@code onSuccess, onFail, beforeCommit, afterCommit}) and with {@code joinTransaction=false}
+     *                  actions ({@code onSuccess, onFail, beforeCommit, afterCompletion}) and with {@code joinTransaction=false}
      */
     TransactionalAction getTransactionalAction(Supplier<CommitContext> supplier);
 
@@ -39,7 +39,7 @@ public interface TransactionalActionFactory {
      * Creates instance of {@link com.haulmont.cuba.core.global.TransactionalAction}.
      * @param commitContext contains all required changes (created, updated and deleted entities)
      * @return              instance of {@link com.haulmont.cuba.core.global.TransactionalAction} without any additional
-     *                      actions ({@code onSuccess, onFail, beforeCommit, afterCommit}) and with {@code joinTransaction=false}
+     *                      actions ({@code onSuccess, onFail, beforeCommit, afterCompletion}) and with {@code joinTransaction=false}
      */
     TransactionalAction getTransactionalAction(CommitContext commitContext);
 
@@ -48,7 +48,7 @@ public interface TransactionalActionFactory {
      * @param supplier          defines how to retrieve {@link com.haulmont.cuba.core.global.CommitContext}
      * @param joinTransaction   defines should {@link com.haulmont.cuba.core.global.CommitContext} be joined to existing transaction or not
      * @return                  instance of {@link com.haulmont.cuba.core.global.TransactionalAction} without any additional
-     *                          actions ({@code onSuccess, onFail, beforeCommit, afterCommit})
+     *                          actions ({@code onSuccess, onFail, beforeCommit, afterCompletion})
      */
     TransactionalAction getTransactionalAction(Supplier<CommitContext> supplier, boolean joinTransaction);
 
@@ -73,8 +73,8 @@ public interface TransactionalActionFactory {
     /**
      * Creates instance of {@link com.haulmont.cuba.core.global.TransactionalAction}.
      * @return instance of {@link com.haulmont.cuba.core.global.TransactionalAction} without {@code commitContext} and any additional
-     *         actions ({@code onSuccess, onFail, beforeCommit, afterCommit}) and with {@code joinTransaction=false}
+     *         actions ({@code onSuccess, onFail, beforeCommit, afterCompletion}) and with {@code joinTransaction=false}
      */
-    TransactionalAction getEmptyTransactionalAction();
+    TransactionalAction getTransactionalAction();
 
 }

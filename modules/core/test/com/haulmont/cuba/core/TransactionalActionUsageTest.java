@@ -52,13 +52,13 @@ public class TransactionalActionUsageTest {
 
     @Test
     public void transactionalActionsAreDifferent() {
-        assertNotEquals(transactionalActionFactory.getEmptyTransactionalAction(), transactionalActionFactory.getEmptyTransactionalAction());
+        assertNotEquals(transactionalActionFactory.getTransactionalAction(), transactionalActionFactory.getTransactionalAction());
     }
 
     @Test
     public void testBeforeCommitAction() {
         EntitySet entities = transactionalActionFactory
-                .getEmptyTransactionalAction()
+                .getTransactionalAction()
                 .withCommitContext(() -> {
                     CommitContext cc = new CommitContext();
                     Product p = metadata.create(Product.class);
@@ -88,7 +88,7 @@ public class TransactionalActionUsageTest {
     @Test
     public void testOnSuccessAction() {
         EntitySet entities = transactionalActionFactory
-                .getEmptyTransactionalAction()
+                .getTransactionalAction()
                 .withCommitContext(() -> {
                     CommitContext cc = new CommitContext();
                     Product p = metadata.create(Product.class);
@@ -120,7 +120,7 @@ public class TransactionalActionUsageTest {
     @Test
     public void testOnFailAction() {
         EntitySet entities = transactionalActionFactory
-                .getEmptyTransactionalAction()
+                .getTransactionalAction()
                 .withCommitContext(() -> {
                     CommitContext cc = new CommitContext();
                     Product p = metadata.create(Product.class);
@@ -142,7 +142,7 @@ public class TransactionalActionUsageTest {
     @Test
     public void testAfterCommitAction() {
         TransactionalAction transactionalAction = transactionalActionFactory
-                .getEmptyTransactionalAction()
+                .getTransactionalAction()
                 .withCommitContext(() -> {
                     CommitContext cc = new CommitContext();
                     Product p = metadata.create(Product.class);
@@ -152,7 +152,7 @@ public class TransactionalActionUsageTest {
                     cc.addInstanceToCommit(p);
                     return cc;
                 })
-                .afterCommit(cc -> {
+                .afterCompletion(cc -> {
                     messageFromAfterCommitAction = "[testAfterCommitAction] transaction ended";
                 });
 
@@ -170,7 +170,7 @@ public class TransactionalActionUsageTest {
     @Test
     public void testAllActions() {
         EntitySet entities = transactionalDataManager
-                .withTransaction(() -> {
+                .commitAction(() -> {
                     CommitContext cc = new CommitContext();
                     Product p = transactionalDataManager.create(Product.class);
                     p.setName("allActionsTest");
@@ -189,7 +189,7 @@ public class TransactionalActionUsageTest {
                 .onFail((cc, t) -> {
                     messageFromOnFailAction = "[testAllActions] commit failed";
                 })
-                .afterCommit(cc -> {
+                .afterCompletion(cc -> {
                     messageFromAfterCommitAction = "[testAllActions] transaction ended";
                 })
                 .perform();

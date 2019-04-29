@@ -129,7 +129,7 @@ public class TransactionalDataManagerBean implements TransactionalDataManager {
     }
 
     @Override
-    public TransactionalAction withTransaction(Supplier<CommitContext> supplier) {
+    public TransactionalAction commitAction(Supplier<CommitContext> supplier) {
         return transactionalActionFactory.getTransactionalAction(supplier, true);
     }
 

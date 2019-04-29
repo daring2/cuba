@@ -37,13 +37,13 @@ public class TransactionalActionFactoryImpl implements TransactionalActionFactor
 
     @Override
     public TransactionalAction getTransactionalAction(CommitContext commitContext) {
-        return ((TransactionalAction) beanLocator.get(TransactionalAction.NAME))
+        return beanLocator.get(TransactionalAction.NAME, TransactionalAction.class)
                 .withCommitContext(commitContext);
     }
 
     @Override
     public TransactionalAction getTransactionalAction(Supplier<CommitContext> supplier, boolean joinTransaction) {
-        return ((TransactionalAction) beanLocator.get(TransactionalAction.NAME))
+        return beanLocator.get(TransactionalAction.NAME, TransactionalAction.class)
                 .withCommitContext(supplier).setJoinTransaction(joinTransaction);
     }
 
@@ -54,17 +54,17 @@ public class TransactionalActionFactoryImpl implements TransactionalActionFactor
                                                       Consumer<CommitContext> beforeCommitAction,
                                                       Consumer<CommitContext> afterCommitAction,
                                                       boolean joinTransaction) {
-        return ((TransactionalAction) beanLocator.get(TransactionalAction.NAME))
+        return beanLocator.get(TransactionalAction.NAME, TransactionalAction.class)
                 .withCommitContext(supplier)
                 .onSuccess(onSuccessAction)
                 .onFail(onFailAction)
                 .beforeCommit(beforeCommitAction)
-                .afterCommit(afterCommitAction)
+                .afterCompletion(afterCommitAction)
                 .setJoinTransaction(joinTransaction);
     }
 
     @Override
-    public TransactionalAction getEmptyTransactionalAction() {
-        return (TransactionalAction) beanLocator.get(TransactionalAction.NAME);
+    public TransactionalAction getTransactionalAction() {
+        return beanLocator.get(TransactionalAction.NAME, TransactionalAction.class);
     }
 }

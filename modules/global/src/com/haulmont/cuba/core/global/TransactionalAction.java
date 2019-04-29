@@ -78,7 +78,7 @@ public interface TransactionalAction {
      * @return          the same instance to which the method was applied
      */
     @CheckReturnValue
-    TransactionalAction afterCommit(Consumer<CommitContext> consumer);
+    TransactionalAction afterCompletion(Consumer<CommitContext> consumer);
 
     /**
      * Specifies the action to retrieve the {@link CommitContext} with all required changes (created, updated, deleted entities).
@@ -111,7 +111,7 @@ public interface TransactionalAction {
      *      2) {@code beforeCommit} action;
      *      3.1) if the commit was successful then {@code onSuccess} action;
      *      3.2) if the commit was unsuccessful then {@code onFail} action;
-     *      4) {@code afterCommit} action.</pre>
+     *      4) {@code afterCompletion} action.</pre>
      <p>If {@code onFail} action is specified (not null) and an exception occurs during {@code commit}
      * then this exception won't be re-thrown by {@code perform()} method.
      * In this case {@code null} value will be returned as a result</p>

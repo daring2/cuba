@@ -244,8 +244,8 @@ public interface TransactionalDataManager {
      * Entry point to TransactionalAction API.
      * @param supplier  defines how to retrieve {@link com.haulmont.cuba.core.global.CommitContext}
      * @return          instance of {@link com.haulmont.cuba.core.global.TransactionalAction} without any additional
-     *                  actions ({@code onSuccess, onFail, beforeCommit, afterCommit}) and with {@code joinTransaction=true}
+     *                  actions ({@code onSuccess, onFail, beforeCommit, afterCompletion}) and with {@code joinTransaction=true}
      */
-    TransactionalAction withTransaction(Supplier<CommitContext> supplier);
+    TransactionalAction commitAction(Supplier<CommitContext> supplier);
 
 }

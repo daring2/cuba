@@ -63,7 +63,7 @@ public class TransactionalActionBean implements TransactionalAction {
     }
 
     @Override
-    public TransactionalAction afterCommit(Consumer<CommitContext> consumer) {
+    public TransactionalAction afterCompletion(Consumer<CommitContext> consumer) {
         this.afterCommitAction = consumer;
         return this;
     }
