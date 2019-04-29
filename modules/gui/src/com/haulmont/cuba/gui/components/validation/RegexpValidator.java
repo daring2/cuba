@@ -10,7 +10,6 @@ import com.haulmont.bali.util.Preconditions;
 import com.haulmont.cuba.core.global.BeanLocator;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.components.ValidationException;
-import org.dom4j.Element;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -59,19 +58,6 @@ public class RegexpValidator extends AbstractValidator<String> {
         Preconditions.checkNotNullArgument(regexp);
 
         this.message = message;
-        this.pattern = Pattern.compile(regexp);
-    }
-
-    /**
-     * @param element     regexp element
-     * @param messagePack message pack
-     */
-    public RegexpValidator(Element element, String messagePack) {
-        this.messagePack = messagePack;
-        this.message = element.attributeValue("message");
-
-        String regexp = element.attributeValue("regexp");
-        Preconditions.checkNotNullArgument(regexp);
         this.pattern = Pattern.compile(regexp);
     }
 

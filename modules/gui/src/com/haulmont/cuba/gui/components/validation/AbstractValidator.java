@@ -25,7 +25,7 @@ import java.util.function.Consumer;
 public abstract class AbstractValidator<T> implements Consumer<T> {
 
     protected Messages messages;
-    protected GStringTemplateEngine engine = new GStringTemplateEngine();
+    protected GStringTemplateEngine engine;
 
     protected String messagePack;
     protected String message;
@@ -57,6 +57,9 @@ public abstract class AbstractValidator<T> implements Consumer<T> {
         if (!Strings.isNullOrEmpty(errorMessage)) {
             StringWriter writer = new StringWriter();
             try {
+                if (engine == null) {
+                    engine = new GStringTemplateEngine();
+                }
                 engine.createTemplate(errorMessage).make(values).writeTo(writer);
                 return writer.toString();
             } catch (ClassNotFoundException | IOException e) {

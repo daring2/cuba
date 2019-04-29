@@ -5,13 +5,11 @@
 
 package com.haulmont.cuba.gui.components.validation;
 
-import com.google.common.base.Strings;
 import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.cuba.core.global.BeanLocator;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.components.ValidationException;
-import com.haulmont.cuba.gui.components.validation.numbers.NumberValidator;
-import org.dom4j.Element;
+import com.haulmont.cuba.gui.components.validation.numbers.NumberConstraint;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -59,21 +57,6 @@ public class MinValidator<T extends Number> extends AbstractValidator<T> {
         this.message = message;
     }
 
-    /**
-     * @param element     'min' element
-     * @param messagePack message pack
-     */
-    public MinValidator(Element element, String messagePack) {
-        this.messagePack = messagePack;
-        this.message = element.attributeValue("message");
-
-        String min = element.attributeValue("value");
-        if (Strings.isNullOrEmpty(messagePack)) {
-            throw new IllegalArgumentException("Min value is not defined");
-        }
-        this.min = Long.parseLong(min);
-    }
-
     @Inject
     public void setMessages(Messages messages) {
         this.messages = messages;
@@ -102,7 +85,7 @@ public class MinValidator<T extends Number> extends AbstractValidator<T> {
             return;
         }
 
-        NumberValidator constraint = getNumberConstraint(value);
+        NumberConstraint constraint = getNumberConstraint(value);
         if (constraint == null
                 || value instanceof Double
                 || value instanceof Float) {

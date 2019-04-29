@@ -5,7 +5,6 @@
 
 package com.haulmont.cuba.gui.components.validation;
 
-import com.google.common.base.Strings;
 import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.chile.core.datatypes.Datatype;
 import com.haulmont.chile.core.datatypes.Datatypes;
@@ -14,8 +13,7 @@ import com.haulmont.cuba.core.global.BeanLocator;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.core.global.UserSessionSource;
 import com.haulmont.cuba.gui.components.ValidationException;
-import com.haulmont.cuba.gui.components.validation.numbers.NumberValidator;
-import org.dom4j.Element;
+import com.haulmont.cuba.gui.components.validation.numbers.NumberConstraint;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -81,27 +79,6 @@ public class DigitsValidator<T> extends AbstractValidator<T> {
         this.message = message;
     }
 
-    /**
-     * @param element     'digits' element
-     * @param messagePack message pack
-     */
-    public DigitsValidator(Element element, String messagePack) {
-        this.messagePack = messagePack;
-        this.message = element.attributeValue("message");
-
-        String integer = element.attributeValue("integer");
-        if (Strings.isNullOrEmpty(integer)) {
-            throw new IllegalArgumentException("Integer value is not defined");
-        }
-        this.integer = Integer.parseInt(integer);
-
-        String fraction = element.attributeValue("fraction");
-        if (Strings.isNullOrEmpty(fraction)) {
-            throw new IllegalArgumentException("Fraction value is not defined");
-        }
-        this.fraction = Integer.parseInt(fraction);
-    }
-
     @Inject
     public void setMessages(Messages messages) {
         this.messages = messages;
@@ -146,7 +123,7 @@ public class DigitsValidator<T> extends AbstractValidator<T> {
             return;
         }
 
-        NumberValidator constraint = null;
+        NumberConstraint constraint = null;
 
         if (value instanceof Number) {
             constraint = getNumberConstraint((Number) value);

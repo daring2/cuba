@@ -9,8 +9,7 @@ import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.cuba.core.global.BeanLocator;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.components.ValidationException;
-import com.haulmont.cuba.gui.components.validation.numbers.NumberValidator;
-import org.dom4j.Element;
+import com.haulmont.cuba.gui.components.validation.numbers.NumberConstraint;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -53,15 +52,6 @@ public class PositiveValidator<T extends Number> extends AbstractValidator<T> {
         this.message = message;
     }
 
-    /**
-     * @param element     'positive' element
-     * @param messagePack message pack
-     */
-    public PositiveValidator(Element element, String messagePack) {
-        this.messagePack = messagePack;
-        this.message = element.attributeValue("message");
-    }
-
     @Inject
     public void setMessages(Messages messages) {
         this.messages = messages;
@@ -74,7 +64,7 @@ public class PositiveValidator<T extends Number> extends AbstractValidator<T> {
             return;
         }
 
-        NumberValidator constraint = getNumberConstraint(value);
+        NumberConstraint constraint = getNumberConstraint(value);
         if (constraint == null) {
             throw new IllegalArgumentException("PositiveValidator doesn't support following type: '" + value.getClass() + "'");
         }

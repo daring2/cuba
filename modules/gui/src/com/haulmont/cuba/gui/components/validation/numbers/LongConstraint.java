@@ -7,37 +7,52 @@ package com.haulmont.cuba.gui.components.validation.numbers;
 
 import java.math.BigDecimal;
 
-public class DoubleValidator implements NumberValidator {
+public class LongConstraint implements NumberConstraint {
 
-    protected Double value;
+    protected Long value;
+    protected BigDecimal bigDecimalValue;
 
-    public DoubleValidator(Double value) {
+    public LongConstraint(Long value) {
         this.value = value;
+        this.bigDecimalValue = new BigDecimal(value);
     }
 
     @Override
     public boolean isMax(long max) {
-        throw new UnsupportedOperationException();
+        return value <= max;
     }
 
     @Override
     public boolean isMin(long min) {
-        throw new UnsupportedOperationException();
+        return value >= min;
     }
 
     @Override
     public boolean isDigits(int integer, int fraction) {
-        throw new UnsupportedOperationException();
+        BigDecimal bigDecimal = new BigDecimal(value).stripTrailingZeros();
+
+        int integerLength = bigDecimal.precision() - bigDecimal.scale();
+        int fractionLength = bigDecimal.scale() < 0 ? 0 : bigDecimal.scale();
+
+        return integer >= integerLength && fraction >= fractionLength;
     }
 
     @Override
     public boolean isDecimalMax(BigDecimal max, boolean inclusive) {
-        throw new UnsupportedOperationException();
+        if (inclusive) {
+            return compareValueWith(max) <= 0;
+        } else {
+            return compareValueWith(max) < 0;
+        }
     }
 
     @Override
     public boolean isDecimalMin(BigDecimal min, boolean inclusive) {
-        throw new UnsupportedOperationException();
+        if (inclusive) {
+            return compareValueWith(min) >= 0;
+        } else {
+            return compareValueWith(min) > 0;
+        }
     }
 
     @Override
@@ -58,5 +73,9 @@ public class DoubleValidator implements NumberValidator {
     @Override
     public boolean isPositive() {
         return value > 0;
+    }
+
+    protected int compareValueWith(BigDecimal val) {
+        return bigDecimalValue.compareTo(val);
     }
 }

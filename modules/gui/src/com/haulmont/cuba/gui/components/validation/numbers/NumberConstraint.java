@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 /**
  * Base interface for number type validators which contains all numeric restrictions.
  */
-public interface NumberValidator {
+public interface NumberConstraint {
 
     /**
      * @param max max value

@@ -9,7 +9,6 @@ import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.cuba.core.global.BeanLocator;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.components.ValidationException;
-import org.dom4j.Element;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -60,24 +59,6 @@ public class SizeValidator<T> extends AbstractValidator<T> {
      */
     public SizeValidator(String message) {
         this.message = message;
-    }
-
-    /**
-     * @param element     size element
-     * @param messagePack message pack
-     */
-    public SizeValidator(Element element, String messagePack) {
-        this.messagePack = messagePack;
-        this.message = element.attributeValue("message");
-
-        String min = element.attributeValue("min");
-        if (min != null) {
-            this.min = Integer.parseInt(min);
-        }
-        String max = element.attributeValue("max");
-        if (max != null) {
-            this.max = Integer.parseInt(max);
-        }
     }
 
     @Inject

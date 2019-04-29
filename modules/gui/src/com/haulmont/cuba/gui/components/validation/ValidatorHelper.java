@@ -18,22 +18,22 @@ import java.util.Date;
 public final class ValidatorHelper {
 
     @Nullable
-    public static NumberValidator getNumberConstraint(Number value) {
+    public static NumberConstraint getNumberConstraint(Number value) {
         if (value == null) {
             return null;
         }
 
         Class clazz = value.getClass();
         if (clazz.equals(Integer.class) || clazz.equals(BigInteger.class)) {
-            return new BigIntegerValidator(BigInteger.valueOf(value.longValue()));
+            return new BigIntegerConstraint(BigInteger.valueOf(value.longValue()));
         } else if (clazz.equals(Long.class)) {
-            return new LongValidator(value.longValue());
+            return new LongConstraint(value.longValue());
         } else if (clazz.equals(BigDecimal.class)) {
-            return new BigDecimalValidator((BigDecimal) value);
+            return new BigDecimalConstraint((BigDecimal) value);
         } else if (clazz.equals(Double.class)) {
-            return new DoubleValidator(value.doubleValue());
+            return new DoubleConstraint(value.doubleValue());
         } else if (clazz.equals(Float.class)) {
-            return new FloatValidator(value.floatValue());
+            return new FloatConstraint(value.floatValue());
         }
         return null;
     }

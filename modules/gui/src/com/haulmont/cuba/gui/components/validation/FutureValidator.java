@@ -10,7 +10,6 @@ import com.haulmont.cuba.core.global.DateTimeTransformations;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.components.ValidationException;
 import com.haulmont.cuba.gui.components.validation.time.TimeValidator;
-import org.dom4j.Element;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -52,20 +51,6 @@ public class FutureValidator<T> extends AbstractValidator<T>   {
      */
     public FutureValidator(String message) {
         this.message = message;
-    }
-
-    /**
-     * @param element     'future' element
-     * @param messagePack message pack
-     */
-    public FutureValidator(Element element, String messagePack) {
-        this.messagePack = messagePack;
-        this.message = element.attributeValue("message");
-
-        String checkSeconds = element.attributeValue("checkSeconds");
-        if (checkSeconds != null) {
-            this.checkSeconds = Boolean.parseBoolean(checkSeconds);
-        }
     }
 
     @Inject

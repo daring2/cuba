@@ -8,7 +8,6 @@ package com.haulmont.cuba.gui.components.validation;
 import com.haulmont.cuba.core.global.BeanLocator;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.components.ValidationException;
-import org.dom4j.Element;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -48,15 +47,6 @@ public class NotEmptyValidator<T> extends AbstractValidator<T> {
      */
     public NotEmptyValidator(String message) {
         this.message = message;
-    }
-
-    /**
-     * @param element     notEmpty element
-     * @param messagePack message pack
-     */
-    public NotEmptyValidator(Element element, String messagePack) {
-        this.messagePack = messagePack;
-        this.message = element.attributeValue("message");
     }
 
     @Inject

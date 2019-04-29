@@ -8,7 +8,7 @@ package com.haulmont.cuba.gui.components.validation;
 import com.haulmont.cuba.core.global.BeanLocator;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.components.ValidationException;
-import org.dom4j.Element;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -43,15 +43,6 @@ public class NotBlankValidator extends AbstractValidator<String> {
         this.message = message;
     }
 
-    /**
-     * @param element     notBlank element
-     * @param messagePack message pack
-     */
-    public NotBlankValidator(Element element, String messagePack) {
-        this.messagePack = messagePack;
-        this.message = element.attributeValue("message");
-    }
-
     @Inject
     public void setMessages(Messages messages) {
         this.messages = messages;
@@ -59,7 +50,7 @@ public class NotBlankValidator extends AbstractValidator<String> {
 
     @Override
     public void accept(String value) throws ValidationException {
-        if (value == null || value.trim().length() == 0) {
+        if (StringUtils.isBlank(value)) {
             String message = loadMessage();
             if (message == null) {
                 message = messages.getMainMessage("validation.constraints.notBlank");
