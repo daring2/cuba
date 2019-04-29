@@ -73,7 +73,7 @@ public class RegexpValidator extends AbstractValidator<String> {
         }
 
         if (!pattern.matcher((value)).matches()) {
-            String message = loadMessage();
+            String message = getMessage();
             if (message == null) {
                 message = messages.getMainMessage("validation.constraints.regexp");
             }

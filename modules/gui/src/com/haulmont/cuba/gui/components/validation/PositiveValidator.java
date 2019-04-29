@@ -70,7 +70,7 @@ public class PositiveValidator<T extends Number> extends AbstractValidator<T> {
         }
 
         if (!constraint.isPositive()) {
-            String message = loadMessage();
+            String message = getMessage();
             if (message == null) {
                 message = messages.getMainMessage("validation.constraints.positive");
             }

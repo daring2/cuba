@@ -93,7 +93,7 @@ public class MinValidator<T extends Number> extends AbstractValidator<T> {
         }
 
         if (!constraint.isMin(min)) {
-            String message = loadMessage();
+            String message = getMessage();
             if (message == null) {
                 message = messages.getMainMessage("validation.constraints.min");
             }

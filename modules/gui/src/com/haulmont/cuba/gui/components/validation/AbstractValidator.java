@@ -27,7 +27,6 @@ public abstract class AbstractValidator<T> implements Consumer<T> {
     protected Messages messages;
     protected GStringTemplateEngine engine;
 
-    protected String messagePack;
     protected String message;
 
     /**
@@ -67,15 +66,5 @@ public abstract class AbstractValidator<T> implements Consumer<T> {
             }
         }
         return errorMessage;
-    }
-
-    @Nullable
-    protected String loadMessage() {
-        if (!Strings.isNullOrEmpty(message)) {
-
-            return !Strings.isNullOrEmpty(messagePack) ?
-                    messages.getTools().loadString(messagePack, message) : message;
-        }
-        return null;
     }
 }

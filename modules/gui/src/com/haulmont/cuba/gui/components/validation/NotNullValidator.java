@@ -52,7 +52,7 @@ public class NotNullValidator<T> extends AbstractValidator<T> {
     @Override
     public void accept(T value) throws ValidationException {
         if (value == null) {
-            String message = loadMessage();
+            String message = getMessage();
             if (message == null) {
                 message = messages.getMainMessage("validation.constraints.notNull");
             }

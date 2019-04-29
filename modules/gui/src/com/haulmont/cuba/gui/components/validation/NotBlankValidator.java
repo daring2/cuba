@@ -51,7 +51,7 @@ public class NotBlankValidator extends AbstractValidator<String> {
     @Override
     public void accept(String value) throws ValidationException {
         if (StringUtils.isBlank(value)) {
-            String message = loadMessage();
+            String message = getMessage();
             if (message == null) {
                 message = messages.getMainMessage("validation.constraints.notBlank");
             }

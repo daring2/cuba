@@ -134,7 +134,7 @@ public class SizeValidator<T> extends AbstractValidator<T> {
             return;
         }
 
-        String message = loadMessage();
+        String message = getMessage();
         Class clazz = value.getClass();
         if (Collection.class.isAssignableFrom(clazz)) {
             int size = ((Collection) value).size();

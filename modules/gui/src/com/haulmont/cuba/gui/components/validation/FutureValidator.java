@@ -88,7 +88,7 @@ public class FutureValidator<T> extends AbstractValidator<T>   {
 
         timeConstraint.setCheckSeconds(checkSeconds);
         if (!timeConstraint.isFuture()) {
-            String message = loadMessage();
+            String message = getMessage();
             if (message == null) {
                 message =  messages.getMainMessage("validation.constraints.future");
             }

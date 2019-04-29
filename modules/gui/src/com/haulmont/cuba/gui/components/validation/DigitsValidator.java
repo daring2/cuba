@@ -153,7 +153,7 @@ public class DigitsValidator<T> extends AbstractValidator<T> {
     }
 
     protected void fireValidationException(T value) {
-        String message = loadMessage();
+        String message = getMessage();
         if (message == null) {
             message = messages.getMainMessage("validation.constraints.digits");
         }

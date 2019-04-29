@@ -70,7 +70,7 @@ public class NegativeValidator<T extends Number> extends AbstractValidator<T> {
         }
 
         if (!constraint.isNegative()) {
-            String message = loadMessage();
+            String message = getMessage();
             if (message == null) {
                 message = messages.getMainMessage("validation.constraints.negative");
             }

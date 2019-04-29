@@ -163,7 +163,7 @@ public class DecimalMinValidator<T> extends AbstractValidator<T> {
     }
 
     protected void fireValidationException(T value) {
-        String message = loadMessage();
+        String message = getMessage();
         String formattedMessage = getTemplateErrorMessage(
                 message == null ? getDefaultMessage() : message,
                 ParamsMap.of("value", value, "min", min));
