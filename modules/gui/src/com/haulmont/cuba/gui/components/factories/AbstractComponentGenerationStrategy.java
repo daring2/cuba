@@ -38,6 +38,7 @@ import com.haulmont.cuba.gui.components.data.options.DatasourceOptions;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.dynamicattributes.DynamicAttributesGuiTools;
 import com.haulmont.cuba.gui.screen.FrameOwner;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 
@@ -79,7 +80,7 @@ public abstract class AbstractComponentGenerationStrategy implements ComponentGe
             if (DynamicAttributesUtils.isDynamicAttribute(metaProperty)) {
                 CategoryAttribute categoryAttribute = DynamicAttributesUtils.getCategoryAttribute(metaProperty);
                 if (categoryAttribute != null && categoryAttribute.getDataType() == PropertyType.ENUMERATION
-                    && !categoryAttribute.getIsCollection()) {
+                    && BooleanUtils.isNotTrue(categoryAttribute.getIsCollection())) {
                     return createEnumField(context);
                 }
             }
