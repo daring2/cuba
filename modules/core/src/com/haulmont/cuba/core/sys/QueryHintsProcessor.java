@@ -26,9 +26,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-@Component(QueryHintsHandler.NAME)
-public class QueryHintsHandler {
-    public static final String NAME = "cuba_QueryHintsHandler";
+@Component(QueryHintsProcessor.NAME)
+public class QueryHintsProcessor {
+    public static final String NAME = "cuba_QueryHintsProcessor";
 
     protected Map<String, BiConsumer<JpaQuery, Object>> hintHandlers = new HashMap<>();
 

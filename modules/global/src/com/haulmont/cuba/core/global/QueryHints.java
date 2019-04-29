@@ -30,13 +30,12 @@ public interface QueryHints {
     /**
      * Sets a SQL hint string into the query that will be generated into the SQL statement.
      * A SQL hint can be used on certain database platforms to define how the query uses indexes
-     * and other such low level usages. This should be the full hint string including the comment \
-     * delimiters.
+     * and other such low level usages.
      */
     String SQL_HINT = "sql.hint";
 
     /**
-     * Sets <code>OPTION(RECOMPILE)</code> SQL hint into the SQL statement for MSSQL database. Any hint value possible.
+     * Adds <code>OPTION(RECOMPILE)</code> SQL hint for MSSQL database. Hint value is ignored.
      */
     String MSSQL_RECOMPILE_HINT = "mssql.recompile";
 }

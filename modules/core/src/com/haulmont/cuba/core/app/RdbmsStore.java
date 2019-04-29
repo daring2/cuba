@@ -637,8 +637,8 @@ public class RdbmsStore implements DataStore {
             }
         }
 
-        if (context.getDbHints() != null) {
-            for (Map.Entry<String, Object> hint : context.getDbHints().entrySet()) {
+        if (context.getHints() != null) {
+            for (Map.Entry<String, Object> hint : context.getHints().entrySet()) {
                 query.setHint(hint.getKey(), hint.getValue());
             }
         }

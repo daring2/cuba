@@ -79,7 +79,7 @@ public class QueryImpl<T> implements TypedQuery<T> {
     @Inject
     protected ServerConfig serverConfig;
     @Inject
-    protected QueryHintsHandler hintsHandler;
+    protected QueryHintsProcessor hintsProcessor;
 
     protected javax.persistence.EntityManager emDelegate;
     protected JpaQuery query;
@@ -176,7 +176,7 @@ public class QueryImpl<T> implements TypedQuery<T> {
 
             if (hints != null) {
                 for (Map.Entry<String, Object> hint : hints.entrySet()) {
-                    hintsHandler.applyQueryHint(query, hint.getKey(), hint.getValue());
+                    hintsProcessor.applyQueryHint(query, hint.getKey(), hint.getValue());
                 }
             }
 
