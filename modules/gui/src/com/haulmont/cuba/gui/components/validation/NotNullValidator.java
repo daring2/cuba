@@ -45,7 +45,7 @@ public class NotNullValidator<T> extends AbstractValidator<T> {
     }
 
     @Inject
-    public void setMessages(Messages messages) {
+    protected void setMessages(Messages messages) {
         this.messages = messages;
     }
 

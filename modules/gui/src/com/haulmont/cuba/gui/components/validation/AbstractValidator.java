@@ -6,12 +6,9 @@
 package com.haulmont.cuba.gui.components.validation;
 
 import com.google.common.base.Strings;
-import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Messages;
 import groovy.text.GStringTemplateEngine;
-import org.dom4j.Element;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Map;
@@ -25,7 +22,6 @@ import java.util.function.Consumer;
 public abstract class AbstractValidator<T> implements Consumer<T> {
 
     protected Messages messages;
-    protected GStringTemplateEngine engine;
 
     protected String message;
 
@@ -56,9 +52,7 @@ public abstract class AbstractValidator<T> implements Consumer<T> {
         if (!Strings.isNullOrEmpty(errorMessage)) {
             StringWriter writer = new StringWriter();
             try {
-                if (engine == null) {
-                    engine = new GStringTemplateEngine();
-                }
+                GStringTemplateEngine engine = new GStringTemplateEngine();
                 engine.createTemplate(errorMessage).make(values).writeTo(writer);
                 return writer.toString();
             } catch (ClassNotFoundException | IOException e) {

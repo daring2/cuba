@@ -58,7 +58,7 @@ public class MinValidator<T extends Number> extends AbstractValidator<T> {
     }
 
     @Inject
-    public void setMessages(Messages messages) {
+    protected void setMessages(Messages messages) {
         this.messages = messages;
     }
 

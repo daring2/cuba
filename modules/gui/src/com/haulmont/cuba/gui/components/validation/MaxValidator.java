@@ -57,6 +57,11 @@ public class MaxValidator<T extends Number> extends AbstractValidator<T> {
         this.message = message;
     }
 
+    @Inject
+    protected void setMessages(Messages messages) {
+        this.messages = messages;
+    }
+
     /**
      * Sets max value.
      *
@@ -71,11 +76,6 @@ public class MaxValidator<T extends Number> extends AbstractValidator<T> {
      */
     public long getMax() {
         return max;
-    }
-
-    @Inject
-    public void setMessages(Messages messages) {
-        this.messages = messages;
     }
 
     @Override

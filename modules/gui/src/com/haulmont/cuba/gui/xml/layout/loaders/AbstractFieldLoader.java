@@ -102,7 +102,7 @@ public abstract class AbstractFieldLoader<T extends Field> extends AbstractDatas
         if (validatorsHolder != null) {
             List<Element> validators = validatorsHolder.elements();
 
-            ValidatorLoadFactory loadFactory = beanLocator.getPrototype(ValidatorLoadFactory.NAME);
+            ValidatorLoadFactory loadFactory = beanLocator.get(ValidatorLoadFactory.NAME);
 
             for (Element validatorElem : validators) {
                 AbstractValidator validator = loadFactory.createValidator(validatorElem, getMessagesPack());

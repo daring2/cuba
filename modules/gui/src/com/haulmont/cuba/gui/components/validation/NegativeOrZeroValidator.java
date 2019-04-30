@@ -53,7 +53,7 @@ public class NegativeOrZeroValidator<T extends Number> extends AbstractValidator
     }
 
     @Inject
-    public void setMessages(Messages messages) {
+    protected void setMessages(Messages messages) {
         this.messages = messages;
     }
 

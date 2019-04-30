@@ -44,7 +44,7 @@ public class NotBlankValidator extends AbstractValidator<String> {
     }
 
     @Inject
-    public void setMessages(Messages messages) {
+    protected void setMessages(Messages messages) {
         this.messages = messages;
     }
 

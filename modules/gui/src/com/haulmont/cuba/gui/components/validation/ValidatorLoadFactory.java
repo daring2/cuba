@@ -63,12 +63,12 @@ public class ValidatorLoadFactory {
             .build();
 
     @Inject
-    public void setBeanLocator(BeanLocator beanLocator) {
+    protected void setBeanLocator(BeanLocator beanLocator) {
         this.beanLocator = beanLocator;
     }
 
     @Inject
-    public void setMessageTools(MessageTools messageTools) {
+    protected void setMessageTools(MessageTools messageTools) {
         this.messageTools = messageTools;
     }
 

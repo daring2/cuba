@@ -46,7 +46,7 @@ public class DigitsValidator<T> extends AbstractValidator<T> {
 
     public static final String NAME = "cuba_DigitsValidator";
 
-    protected UserSessionSource userSessionSource = AppBeans.get(UserSessionSource.NAME);
+    protected UserSessionSource userSessionSource;
 
     protected int integer;
     protected int fraction;
@@ -80,7 +80,12 @@ public class DigitsValidator<T> extends AbstractValidator<T> {
     }
 
     @Inject
-    public void setMessages(Messages messages) {
+    protected void setUserSessionSource(UserSessionSource userSessionSource) {
+        this.userSessionSource = userSessionSource;
+    }
+
+    @Inject
+    protected void setMessages(Messages messages) {
         this.messages = messages;
     }
 
