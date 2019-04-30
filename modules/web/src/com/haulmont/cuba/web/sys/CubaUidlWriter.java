@@ -99,26 +99,20 @@ public class CubaUidlWriter extends UidlWriter {
             }
         }
 
-        if (hasDuplicateDependencies(scriptDependencies)) {
-            List<String> scripts = new ArrayList<>();
-            for (String dependency : scriptDependencies) {
-                if (!scripts.contains(dependency)) {
-                    scripts.add(dependency);
-                }
-            }
-            scriptDependencies.clear();
-            scriptDependencies.addAll(scripts);
-        }
+        removeDuplicateDependencies(scriptDependencies);
+        removeDuplicateDependencies(styleDependencies);
+    }
 
-        if (hasDuplicateDependencies(styleDependencies)) {
-            List<String> styles = new ArrayList<>();
-            for (String dependency : styleDependencies) {
-                if (!styles.contains(dependency)) {
-                    styles.add(dependency);
+    protected void removeDuplicateDependencies(List<String> dependencies) {
+        if (hasDuplicateDependencies(dependencies)) {
+            List<String> uniqueValues = new ArrayList<>();
+            for (String dependency : dependencies) {
+                if (!uniqueValues.contains(dependency)) {
+                    uniqueValues.add(dependency);
                 }
             }
-            styleDependencies.clear();
-            styleDependencies.addAll(styles);
+            dependencies.clear();
+            dependencies.addAll(uniqueValues);
         }
     }
 
