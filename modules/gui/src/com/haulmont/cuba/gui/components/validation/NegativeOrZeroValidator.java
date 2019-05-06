@@ -6,8 +6,10 @@
 package com.haulmont.cuba.gui.components.validation;
 
 import com.haulmont.bali.util.ParamsMap;
+import com.haulmont.chile.core.datatypes.DatatypeRegistry;
 import com.haulmont.cuba.core.global.BeanLocator;
 import com.haulmont.cuba.core.global.Messages;
+import com.haulmont.cuba.core.global.UserSessionSource;
 import com.haulmont.cuba.gui.components.ValidationException;
 import com.haulmont.cuba.gui.components.validation.numbers.NumberConstraint;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -57,6 +59,16 @@ public class NegativeOrZeroValidator<T extends Number> extends AbstractValidator
         this.messages = messages;
     }
 
+    @Inject
+    protected void setDatatypeRegistry(DatatypeRegistry datatypeRegistry) {
+        this.datatypeRegistry = datatypeRegistry;
+    }
+
+    @Inject
+    protected void setUserSessionSource(UserSessionSource userSessionSource) {
+        this.userSessionSource = userSessionSource;
+    }
+
     @Override
     public void accept(T value) throws ValidationException {
         // consider null value is valid
@@ -75,7 +87,8 @@ public class NegativeOrZeroValidator<T extends Number> extends AbstractValidator
                 message = messages.getMainMessage("validation.constraints.negativeOrZero");
             }
 
-            throw new ValidationException(getTemplateErrorMessage(message, ParamsMap.of("value", value)));
+            String formattedValue = formatValue(value);
+            throw new ValidationException(getTemplateErrorMessage(message, ParamsMap.of("value", formattedValue)));
         }
     }
 }

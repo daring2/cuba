@@ -7,8 +7,7 @@ package com.haulmont.cuba.gui.components.validation;
 
 import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.chile.core.datatypes.Datatype;
-import com.haulmont.chile.core.datatypes.Datatypes;
-import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.chile.core.datatypes.DatatypeRegistry;
 import com.haulmont.cuba.core.global.BeanLocator;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.core.global.UserSessionSource;
@@ -45,8 +44,6 @@ public class DecimalMinValidator<T> extends AbstractValidator<T> {
 
     public static final String NAME = "cuba_DecimalMinValidator";
 
-    protected UserSessionSource userSessionSource = AppBeans.get(UserSessionSource.NAME);
-
     protected BigDecimal min;
     protected boolean inclusive = true;
 
@@ -75,6 +72,16 @@ public class DecimalMinValidator<T> extends AbstractValidator<T> {
     @Inject
     protected void setMessages(Messages messages) {
         this.messages = messages;
+    }
+
+    @Inject
+    protected void setDatatypeRegistry(DatatypeRegistry datatypeRegistry) {
+        this.datatypeRegistry = datatypeRegistry;
+    }
+
+    @Inject
+    protected void setUserSessionSource(UserSessionSource userSessionSource) {
+        this.userSessionSource = userSessionSource;
     }
 
     /**
@@ -133,7 +140,7 @@ public class DecimalMinValidator<T> extends AbstractValidator<T> {
             constraint = getNumberConstraint((Number) value);
         } else if (value instanceof String) {
             try {
-                Datatype datatype = Datatypes.getNN(BigDecimal.class);
+                Datatype datatype = datatypeRegistry.getNN(BigDecimal.class);
                 Locale locale = userSessionSource.getUserSession().getLocale();
                 BigDecimal bigDecimal = (BigDecimal) datatype.parse((String) value, locale);
                 if (bigDecimal == null) {
@@ -164,9 +171,13 @@ public class DecimalMinValidator<T> extends AbstractValidator<T> {
 
     protected void fireValidationException(T value) {
         String message = getMessage();
+
+        String formattedValue = formatValue(value);
+        String formattedMin = formatValue(min);
+
         String formattedMessage = getTemplateErrorMessage(
                 message == null ? getDefaultMessage() : message,
-                ParamsMap.of("value", value, "min", min));
+                ParamsMap.of("value", formattedValue, "min", formattedMin));
 
         throw new ValidationException(formattedMessage);
     }

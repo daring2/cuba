@@ -6,7 +6,10 @@
 package com.haulmont.cuba.gui.components.validation;
 
 import com.google.common.base.Strings;
+import com.haulmont.chile.core.datatypes.Datatype;
+import com.haulmont.chile.core.datatypes.DatatypeRegistry;
 import com.haulmont.cuba.core.global.Messages;
+import com.haulmont.cuba.core.global.UserSessionSource;
 import groovy.text.GStringTemplateEngine;
 
 import java.io.IOException;
@@ -22,6 +25,8 @@ import java.util.function.Consumer;
 public abstract class AbstractValidator<T> implements Consumer<T> {
 
     protected Messages messages;
+    protected UserSessionSource userSessionSource;
+    protected DatatypeRegistry datatypeRegistry;
 
     protected String message;
 
@@ -60,5 +65,15 @@ public abstract class AbstractValidator<T> implements Consumer<T> {
             }
         }
         return errorMessage;
+    }
+
+    protected String formatValue(Object value) {
+        Datatype datatype = datatypeRegistry.get(value.getClass());
+        if (datatype == null) {
+            return value.toString();
+        }
+
+        String formattedValue = datatype.format(value, userSessionSource.getLocale());
+        return formattedValue == null ? value.toString() : formattedValue;
     }
 }

@@ -7,8 +7,8 @@ package com.haulmont.cuba.gui.components.validation;
 
 import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.chile.core.datatypes.Datatype;
+import com.haulmont.chile.core.datatypes.DatatypeRegistry;
 import com.haulmont.chile.core.datatypes.Datatypes;
-import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.BeanLocator;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.core.global.UserSessionSource;
@@ -45,8 +45,6 @@ public class DecimalMaxValidator<T> extends AbstractValidator<T> {
 
     public static final String NAME = "cuba_DecimalMaxValidator";
 
-    protected UserSessionSource userSessionSource = AppBeans.get(UserSessionSource.NAME);
-
     protected BigDecimal max;
     protected boolean inclusive = true;
 
@@ -75,6 +73,16 @@ public class DecimalMaxValidator<T> extends AbstractValidator<T> {
     @Inject
     protected void setMessages(Messages messages) {
         this.messages = messages;
+    }
+
+    @Inject
+    protected void setDatatypeRegistry(DatatypeRegistry datatypeRegistry) {
+        this.datatypeRegistry = datatypeRegistry;
+    }
+
+    @Inject
+    protected void setUserSessionSource(UserSessionSource userSessionSource) {
+        this.userSessionSource = userSessionSource;
     }
 
     /**
@@ -164,9 +172,13 @@ public class DecimalMaxValidator<T> extends AbstractValidator<T> {
 
     protected void fireValidationException(T value) {
         String message = getMessage();
+
+        String formattedValue = formatValue(value);
+        String formattedMax = formatValue(max);
+
         String formattedMessage = getTemplateErrorMessage(
                 message == null ? getDefaultMessage() : message,
-                ParamsMap.of("value", value, "max", max));
+                ParamsMap.of("value", formattedValue, "max", formattedMax));
 
         throw new ValidationException(formattedMessage);
     }

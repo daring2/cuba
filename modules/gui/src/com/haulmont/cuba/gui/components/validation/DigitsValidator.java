@@ -7,8 +7,8 @@ package com.haulmont.cuba.gui.components.validation;
 
 import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.chile.core.datatypes.Datatype;
+import com.haulmont.chile.core.datatypes.DatatypeRegistry;
 import com.haulmont.chile.core.datatypes.Datatypes;
-import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.BeanLocator;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.core.global.UserSessionSource;
@@ -46,8 +46,6 @@ public class DigitsValidator<T> extends AbstractValidator<T> {
 
     public static final String NAME = "cuba_DigitsValidator";
 
-    protected UserSessionSource userSessionSource;
-
     protected int integer;
     protected int fraction;
 
@@ -77,6 +75,11 @@ public class DigitsValidator<T> extends AbstractValidator<T> {
         this.integer = integer;
         this.fraction = fraction;
         this.message = message;
+    }
+
+    @Inject
+    protected void setDatatypeRegistry(DatatypeRegistry datatypeRegistry) {
+        this.datatypeRegistry = datatypeRegistry;
     }
 
     @Inject
@@ -163,11 +166,12 @@ public class DigitsValidator<T> extends AbstractValidator<T> {
             message = messages.getMainMessage("validation.constraints.digits");
         }
 
-        String formatMessage = getTemplateErrorMessage(message,
-                ParamsMap.of("value", value,
+        String formattedValue = formatValue(value);
+        String formattedMessage = getTemplateErrorMessage(message,
+                ParamsMap.of("value", formattedValue,
                              "integer", integer,
                              "fraction", fraction));
 
-        throw new ValidationException(formatMessage);
+        throw new ValidationException(formattedMessage);
     }
 }

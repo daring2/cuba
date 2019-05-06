@@ -6,8 +6,10 @@
 package com.haulmont.cuba.gui.components.validation;
 
 import com.haulmont.bali.util.ParamsMap;
+import com.haulmont.chile.core.datatypes.DatatypeRegistry;
 import com.haulmont.cuba.core.global.BeanLocator;
 import com.haulmont.cuba.core.global.Messages;
+import com.haulmont.cuba.core.global.UserSessionSource;
 import com.haulmont.cuba.gui.components.ValidationException;
 import com.haulmont.cuba.gui.components.validation.numbers.NumberConstraint;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -62,6 +64,16 @@ public class MinValidator<T extends Number> extends AbstractValidator<T> {
         this.messages = messages;
     }
 
+    @Inject
+    protected void setDatatypeRegistry(DatatypeRegistry datatypeRegistry) {
+        this.datatypeRegistry = datatypeRegistry;
+    }
+
+    @Inject
+    protected void setUserSessionSource(UserSessionSource userSessionSource) {
+        this.userSessionSource = userSessionSource;
+    }
+
     /**
      * Sets min value.
      *
@@ -98,7 +110,9 @@ public class MinValidator<T extends Number> extends AbstractValidator<T> {
                 message = messages.getMainMessage("validation.constraints.min");
             }
 
-            throw new ValidationException(getTemplateErrorMessage(message, ParamsMap.of("value", value, "min", min)));
+            String formattedValue = formatValue(value);
+            String formattedMin = formatValue(min);
+            throw new ValidationException(getTemplateErrorMessage(message, ParamsMap.of("value", formattedValue, "min", formattedMin)));
         }
     }
 }
