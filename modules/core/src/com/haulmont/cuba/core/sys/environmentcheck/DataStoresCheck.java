@@ -40,12 +40,12 @@ public class DataStoresCheck implements EnvironmentCheck {
         String mainDsJndiName = AppContext.getProperty("cuba.dataSourceJndiName");
         try {
             dataSource = lookup.getDataSource(mainDsJndiName == null ? "jdbc/CubaDS" : mainDsJndiName);
-            List<CheckFailedResult> checkFailedResults = checkDataStore("main Data Store", dataSource, true);
+            List<CheckFailedResult> checkFailedResults = checkDataStore("Main", dataSource, true);
             if (!checkFailedResults.isEmpty()) {
                 result.addAll(checkFailedResults);
             }
         } catch (DataSourceLookupFailureException e) {
-            result.add(new CheckFailedResult("Can not find JNDI datasource for main Data Store", e));
+            result.add(new CheckFailedResult("Can not find JNDI datasource for Data Store: Main", e));
         }
 
         String additionalStores = AppContext.getProperty("cuba.additionalStores");
