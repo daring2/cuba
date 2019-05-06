@@ -347,14 +347,8 @@ public class FetchGroupManager {
                             }
                         }
                         if (result.isEmpty()) {
-                            String primaryKey = "id";
-                            for (MetaProperty property : inverseProp.getDomain().getProperties()){
-                                if (property.getAnnotations().containsKey("cuba.primaryKey")){
-                                    primaryKey = property.getName();
-                                    break;
-                                }
-                            }
-                            result.add(toManyField.path() + "." + inverseProp.getName() + "." + primaryKey);
+                            result.add(toManyField.path() + "." + inverseProp.getName() + "."
+                                    + metadataTools.getPrimaryKeyName(inverseProp.getDomain()));
                         }
                     } else {
                         result.add(toManyField.path() + "." + inverseProp.getName());
