@@ -70,7 +70,7 @@ public class RootNavigationHandler extends AbstractNavigationHandler implements 
             return true;
         }
 
-        if (shouldRedirect(windowInfo, security, ui)) {
+        if (shouldRedirect(windowInfo, beanLocator, ui)) {
             redirect(requestedState, ui, beanLocator);
             return true;
         }

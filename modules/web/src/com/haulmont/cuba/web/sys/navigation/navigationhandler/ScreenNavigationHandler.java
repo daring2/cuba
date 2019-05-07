@@ -119,7 +119,7 @@ public class ScreenNavigationHandler extends AbstractNavigationHandler implement
                 return true;
             }
 
-            if (shouldRedirect(routeWindowInfo, security, ui)) {
+            if (shouldRedirect(routeWindowInfo, beanLocator, ui)) {
                 redirect(requestedState, ui, beanLocator);
                 return true;
             }

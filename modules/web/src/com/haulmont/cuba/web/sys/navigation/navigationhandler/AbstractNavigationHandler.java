@@ -57,12 +57,18 @@ public abstract class AbstractNavigationHandler implements NavigationHandler {
                 && windowInfo.getRouteDefinition().isRoot();
     }
 
-    protected boolean shouldRedirect(WindowInfo windowInfo, Security security, AppUI ui) {
+    protected boolean shouldRedirect(WindowInfo windowInfo, BeanLocator beanLocator, AppUI ui) {
         if (ui.hasAuthenticatedSession()) {
             return false;
         }
 
-        return !security.isScreenPermitted(windowInfo.getId());
+        boolean allowAnonymousAccess = beanLocator.get(Configuration.class)
+                .getConfig(WebConfig.class)
+                .getAllowAnonymousAccess();
+
+        return !allowAnonymousAccess
+                || !beanLocator.get(Security.class)
+                        .isScreenPermitted(windowInfo.getId());
     }
 
     protected void redirect(NavigationState navigationState, AppUI ui, BeanLocator beanLocator) {

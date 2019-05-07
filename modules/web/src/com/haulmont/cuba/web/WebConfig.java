@@ -540,4 +540,11 @@ public interface WebConfig extends Config {
     @Property("cuba.web.forceRefreshLoggedTabs")
     @DefaultBoolean(false)
     boolean getForceRefreshLoggedTabs();
+
+    /**
+     * Defines whether anonymous user is allowed to access the app.
+     */
+    @Property("cuba.web.allowAnonymousAccess")
+    @DefaultBoolean(false)
+    boolean getAllowAnonymousAccess();
 }
