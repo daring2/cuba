@@ -80,6 +80,18 @@ public class WebOptionsGroup<V, I> extends WebAbstractField<CubaOptionGroup, V> 
         return generateDefaultItemCaption(item);
     }
 
+    @Override
+    public V getValue() {
+        return internalValue;
+    }
+
+    @Override
+    public void setValue(V value) {
+        internalValue = value;
+
+        setValueToPresentation(convertToPresentation(value));
+    }
+
     @Inject
     public void setMetadataTools(MetadataTools metadataTools) {
         this.metadataTools = metadataTools;
