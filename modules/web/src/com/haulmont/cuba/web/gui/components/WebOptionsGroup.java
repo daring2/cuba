@@ -137,8 +137,11 @@ public class WebOptionsGroup<V, I> extends WebAbstractField<CubaOptionGroup, V> 
             Set collectionValue = (Set) componentRawValue;
 
             List<I> itemIds = getCurrentItems();
-            Stream<I> selectedItemsStream = itemIds.stream()
-                    .filter(collectionValue::contains);
+
+            //noinspection RedundantCast
+            Stream<I> selectedItemsStream = collectionValue.stream()
+                    .filter(item -> itemIds.isEmpty()
+                            || itemIds.contains((I) item));
 
             if (valueBinding != null) {
                 Class<V> targetType = valueBinding.getSource().getType();
@@ -204,7 +207,7 @@ public class WebOptionsGroup<V, I> extends WebAbstractField<CubaOptionGroup, V> 
 
         if (options != null) {
             OptionsBinder optionsBinder = beanLocator.get(OptionsBinder.NAME, OptionsBinder.class);
-            this.optionsBinding = optionsBinder.bind(options, this, this::setItemsToPresentation);
+            this.optionsBinding = optionsBinder.bind(options, this, this::setOptionsToComponent);
             this.optionsBinding.activate();
         }
     }
@@ -225,7 +228,7 @@ public class WebOptionsGroup<V, I> extends WebAbstractField<CubaOptionGroup, V> 
         component.setValueIgnoreReadOnly(value);
     }
 
-    protected void setItemsToPresentation(Stream<I> options) {
+    protected void setOptionsToComponent(Stream<I> options) {
         List<I> itemIds = options.collect(Collectors.toList());
         component.setContainerDataSource(new IndexedContainer(itemIds));
     }
