@@ -36,11 +36,7 @@ import com.haulmont.cuba.gui.screen.ScreenFragment;
 import com.haulmont.cuba.gui.screen.ScreenOptions;
 import com.haulmont.cuba.gui.screen.UiControllerUtils;
 import com.haulmont.cuba.gui.screen.compatibility.LegacyFrame;
-import com.haulmont.cuba.gui.sys.CompanionDependencyInjector;
-import com.haulmont.cuba.gui.sys.ScreenViewsLoader;
-import com.haulmont.cuba.gui.sys.UiControllerDependencyInjector;
-import com.haulmont.cuba.gui.sys.UiControllerPropertyInjector;
-import com.haulmont.cuba.gui.sys.UiControllerProperty;
+import com.haulmont.cuba.gui.sys.*;
 import com.haulmont.cuba.gui.xml.data.DsContextLoader;
 import com.haulmont.cuba.gui.xml.layout.ComponentRootLoader;
 import org.apache.commons.lang3.StringUtils;
@@ -277,9 +273,20 @@ public class FragmentLoader extends ContainerLoader<Fragment> implements Compone
 
             List<UiControllerProperty> properties = fragmentLoaderContext.getProperties();
             if (!properties.isEmpty()) {
-                UiControllerPropertyInjector propertyInjector = beanLocator.getPrototype(UiControllerPropertyInjector.NAME,
-                        frameOwner, properties);
+                UiControllerPropertyInjector propertyInjector =
+                        beanLocator.getPrototype(UiControllerPropertyInjector.NAME, frameOwner, properties);
                 propertyInjector.inject();
+            }
+
+            FragmentContextImpl fragmentContext = (FragmentContextImpl) fragment.getContext();
+            fragmentContext.setInitialized(true);
+
+            // fire attached
+
+            if (!fragmentContext.isManualInitRequired()) {
+                UiControllerUtils.fireEvent(frameOwner,
+                        ScreenFragment.AttachEvent.class,
+                        new ScreenFragment.AttachEvent(frameOwner));
             }
         }
     }

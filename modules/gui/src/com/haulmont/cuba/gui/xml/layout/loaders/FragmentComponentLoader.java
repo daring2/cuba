@@ -17,7 +17,6 @@
 package com.haulmont.cuba.gui.xml.layout.loaders;
 
 import com.haulmont.cuba.core.global.DevelopmentException;
-import com.haulmont.cuba.gui.FrameContext;
 import com.haulmont.cuba.gui.GuiDevelopmentException;
 import com.haulmont.cuba.gui.components.AbstractFrame;
 import com.haulmont.cuba.gui.components.Fragment;
@@ -31,7 +30,7 @@ import com.haulmont.cuba.gui.model.impl.ScreenDataImpl;
 import com.haulmont.cuba.gui.screen.FrameOwner;
 import com.haulmont.cuba.gui.screen.ScreenContext;
 import com.haulmont.cuba.gui.screen.ScreenFragment;
-import com.haulmont.cuba.gui.sys.FrameContextImpl;
+import com.haulmont.cuba.gui.sys.FragmentContextImpl;
 import com.haulmont.cuba.gui.sys.ScreenContextImpl;
 import com.haulmont.cuba.gui.sys.UiControllerProperty;
 import com.haulmont.cuba.gui.xml.layout.ComponentLoader;
@@ -117,7 +116,7 @@ public class FragmentComponentLoader extends ContainerLoader<Fragment> {
         fragmentImpl.setFrameOwner(controller);
         fragmentImpl.setId(fragmentId);
 
-        FrameContext frameContext = new FrameContextImpl(fragment);
+        FragmentContextImpl frameContext = new FragmentContextImpl(fragment, innerContext);
         ((FrameImplementation) fragment).setContext(frameContext);
 
         // load from XML if needed
@@ -157,7 +156,7 @@ public class FragmentComponentLoader extends ContainerLoader<Fragment> {
             descriptorPath = StringUtils.substring(descriptorPath, 0, descriptorPath.lastIndexOf("/"));
         }
 
-        String messagesPack = descriptorPath.replaceAll("/", ".");
+        String messagesPack = descriptorPath.replace("/", ".");
         int start = messagesPack.startsWith(".") ? 1 : 0;
         messagesPack = messagesPack.substring(start);
         return messagesPack;
