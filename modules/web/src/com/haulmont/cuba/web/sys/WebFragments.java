@@ -41,6 +41,7 @@ import com.haulmont.cuba.gui.xml.layout.ComponentLoader;
 import com.haulmont.cuba.gui.xml.layout.LayoutLoader;
 import com.haulmont.cuba.gui.xml.layout.ScreenXmlLoader;
 import com.haulmont.cuba.gui.xml.layout.loaders.ComponentLoaderContext;
+import com.haulmont.cuba.gui.xml.layout.loaders.FragmentComponentLoader.FragmentLoaderInjectTask;
 import com.haulmont.cuba.web.AppUI;
 import com.vaadin.server.ClientConnector;
 import org.apache.commons.lang3.StringUtils;
@@ -55,6 +56,7 @@ import java.util.Locale;
 import static com.haulmont.bali.util.Preconditions.checkNotNullArgument;
 import static com.haulmont.cuba.gui.logging.UIPerformanceLogger.createStopWatch;
 import static com.haulmont.cuba.gui.screen.UiControllerUtils.*;
+import static com.haulmont.cuba.gui.xml.layout.loaders.FragmentComponentLoader.FragmentLoaderInitTask;
 
 public class WebFragments implements Fragments {
 
@@ -178,7 +180,7 @@ public class WebFragments implements Fragments {
                     innerContext.getParams());
 
             ComponentLoader<Fragment> fragmentLoader =
-                    layoutLoader.createFragmentContent(fragment, windowElement, windowInfo.getId());
+                    layoutLoader.createFragmentContent(fragment, windowElement);
 
             fragmentLoader.loadComponent();
 
@@ -186,6 +188,9 @@ public class WebFragments implements Fragments {
             loaderContext.getInitTasks().addAll(innerContext.getInitTasks());
             loaderContext.getPostInitTasks().addAll(innerContext.getPostInitTasks());
         }
+
+        loaderContext.addInjectTask(new FragmentLoaderInjectTask(fragment, options, beanLocator));
+        loaderContext.addInitTask(new FragmentLoaderInitTask(fragment, options, loaderContext, beanLocator));
 
         loadStopWatch.stop();
 

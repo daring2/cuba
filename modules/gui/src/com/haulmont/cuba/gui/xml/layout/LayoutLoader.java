@@ -133,7 +133,6 @@ public class LayoutLoader {
 
         ComponentLoader loader = getLoader(element);
         FragmentLoader fragmentLoader = (FragmentLoader) loader;
-        fragmentLoader.setFrameId(id);
 
         loader.createComponent();
 
@@ -147,10 +146,8 @@ public class LayoutLoader {
         return loader;
     }
 
-    public ComponentLoader<Fragment> createFragmentContent(Fragment fragment, Element rootWindowElement, String fragmentId) {
+    public ComponentLoader<Fragment> createFragmentContent(Fragment fragment, Element rootWindowElement) {
         FragmentLoader fragmentLoader = getFragmentLoader(rootWindowElement);
-
-        fragmentLoader.setFrameId(fragmentId);
         fragmentLoader.setResultComponent(fragment);
 
         Element layout = rootWindowElement.element("layout");

@@ -20,10 +20,26 @@ import com.haulmont.cuba.gui.screen.ScreenFragment;
 import com.haulmont.cuba.gui.screen.Subscribe;
 import com.haulmont.cuba.gui.screen.UiController;
 
-@UiController
+import java.util.ArrayList;
+import java.util.List;
+
+@UiController("test_TestAttachFragment")
 public class TestAttachFragment extends ScreenFragment {
+
+    public List<Class> eventLog = new ArrayList<>();
+
     @Subscribe
     protected void onAttach(AttachEvent event) {
+        eventLog.add(AttachEvent.class);
+    }
 
+    @Subscribe
+    protected void onInit(InitEvent event) {
+        eventLog.add(InitEvent.class);
+    }
+
+    @Subscribe
+    protected void onAfterInit(AfterInitEvent event) {
+        eventLog.add(AfterInitEvent.class);
     }
 }

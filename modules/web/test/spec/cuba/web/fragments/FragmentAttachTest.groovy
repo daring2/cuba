@@ -16,15 +16,74 @@
 
 package spec.cuba.web.fragments
 
+import com.haulmont.cuba.gui.components.Fragment
+import com.haulmont.cuba.gui.screen.OpenMode
+import com.haulmont.cuba.security.app.UserManagementService
+import com.haulmont.cuba.web.app.main.MainScreen
+import com.haulmont.cuba.web.testsupport.TestServiceProxy
 import spec.cuba.web.UiScreenSpec
+import spec.cuba.web.fragments.screens.ScreenWithFragment
+import spec.cuba.web.fragments.screens.ScreenWithXmlFragment
+import spec.cuba.web.fragments.screens.TestAttachFragment
 
+import static com.haulmont.cuba.gui.screen.ScreenFragment.*
+
+@SuppressWarnings(["GroovyAccessibility", "GroovyAssignabilityCheck"])
 class FragmentAttachTest extends UiScreenSpec {
 
+    def setup() {
+        TestServiceProxy.mock(UserManagementService, Mock(UserManagementService) {
+            getSubstitutedUsers(_) >> Collections.emptyList()
+        })
+
+        exportScreensPackages(['spec.cuba.web.fragments.screens', 'com.haulmont.cuba.web.app.main'])
+    }
+
+    def cleanup() {
+        TestServiceProxy.clear()
+
+        resetScreensConfig()
+    }
+
     def "open screen with declarative fragment"() {
-        // todo
+        def screens = vaadinUi.screens
+
+        def mainWindow = screens.create(MainScreen, OpenMode.ROOT)
+        screens.show(mainWindow)
+
+        when:
+
+        def screen = screens.create(ScreenWithXmlFragment)
+        screen.show()
+
+        then:
+
+        def fragment = screen.getWindow().getComponent(0) as Fragment
+        fragment != null
+        def controller = fragment.frameOwner as TestAttachFragment
+        controller != null
+
+        controller.eventLog == [InitEvent.class, AfterInitEvent.class, AttachEvent.class]
     }
 
     def "open screen with programmatically added fragment"() {
-        // todo
+        def screens = vaadinUi.screens
+
+        def mainWindow = screens.create(MainScreen, OpenMode.ROOT)
+        screens.show(mainWindow)
+
+        when:
+
+        def screen = screens.create(ScreenWithFragment)
+        screen.show()
+
+        then:
+
+        def fragment = screen.getWindow().getComponent(0) as Fragment
+        fragment != null
+        def controller = fragment.frameOwner as TestAttachFragment
+        controller != null
+
+        controller.eventLog == [InitEvent.class, AfterInitEvent.class, AttachEvent.class]
     }
 }
