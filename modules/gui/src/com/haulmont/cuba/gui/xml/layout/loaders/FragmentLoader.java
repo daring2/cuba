@@ -30,7 +30,6 @@ import com.haulmont.cuba.gui.logging.ScreenLifeCycle;
 import com.haulmont.cuba.gui.model.ScreenData;
 import com.haulmont.cuba.gui.model.impl.ScreenDataXmlLoader;
 import com.haulmont.cuba.gui.screen.FrameOwner;
-import com.haulmont.cuba.gui.screen.ScreenOptions;
 import com.haulmont.cuba.gui.screen.UiControllerUtils;
 import com.haulmont.cuba.gui.screen.compatibility.LegacyFrame;
 import com.haulmont.cuba.gui.sys.CompanionDependencyInjector;
@@ -46,10 +45,6 @@ import javax.annotation.Nullable;
 import static com.haulmont.cuba.gui.logging.UIPerformanceLogger.createStopWatch;
 
 public class FragmentLoader extends ContainerLoader<Fragment> implements ComponentRootLoader<Fragment> {
-
-    protected ScreenViewsLoader getScreenViewsLoader() {
-        return beanLocator.get(ScreenViewsLoader.NAME);
-    }
 
     @Override
     public void createComponent() {
@@ -111,16 +106,18 @@ public class FragmentLoader extends ContainerLoader<Fragment> implements Compone
         }
 
         if (resultComponent.getFrameOwner() instanceof AbstractFrame) {
-            ComponentLoaderContext parentContext = (ComponentLoaderContext) getComponentContext().getParent();
-            ScreenOptions options = parentContext.getOptions();
             Element companionsElem = element.element("companions");
             if (companionsElem != null) {
-                getComponentContext().addInjectTask(new FragmentLoaderCompanionTask(resultComponent, options));
+                getComponentContext().addInjectTask(new FragmentLoaderCompanionTask(resultComponent));
             }
         }
 
         loadSubComponentsAndExpand(resultComponent, layoutElement);
         setComponentsRatio(resultComponent, layoutElement);
+    }
+
+    protected ScreenViewsLoader getScreenViewsLoader() {
+        return beanLocator.get(ScreenViewsLoader.NAME);
     }
 
     protected void loadScreenData(Element dataEl) {
@@ -170,11 +167,9 @@ public class FragmentLoader extends ContainerLoader<Fragment> implements Compone
 
     protected class FragmentLoaderCompanionTask implements InjectTask {
         protected Fragment fragment;
-        protected ScreenOptions options;
 
-        public FragmentLoaderCompanionTask(Fragment fragment, ScreenOptions options) {
+        public FragmentLoaderCompanionTask(Fragment fragment) {
             this.fragment = fragment;
-            this.options = options;
         }
 
         @Override
