@@ -36,11 +36,30 @@ import static com.haulmont.cuba.web.sys.navigation.UrlTools.replaceState;
 
 public abstract class AbstractNavigationHandler implements NavigationHandler {
 
+    protected AppUI ui;
+    protected BeanLocator beanLocator;
+
+    public AbstractNavigationHandler(BeanLocator beanLocator) {
+        this.beanLocator = beanLocator;
+    }
+
+    protected void setUi(AppUI ui) {
+        this.ui = ui;
+    }
+
+    protected void checkUi() {
+        if (ui == null) {
+            throw new IllegalStateException("No AppUI instance is provided");
+        }
+    }
+
     protected boolean isEmptyState(NavigationState requestedState) {
         return requestedState == null || requestedState == NavigationState.EMPTY;
     }
 
-    protected void revertNavigationState(AppUI ui) {
+    protected void revertNavigationState() {
+        checkUi();
+
         UrlChangeHandler urlChangeHandler = ui.getUrlChangeHandler();
         NavigationState currentState = ui.getHistory().getNow();
 
@@ -57,7 +76,9 @@ public abstract class AbstractNavigationHandler implements NavigationHandler {
                 && windowInfo.getRouteDefinition().isRoot();
     }
 
-    protected boolean shouldRedirect(WindowInfo windowInfo, BeanLocator beanLocator, AppUI ui) {
+    protected boolean shouldRedirect(WindowInfo windowInfo) {
+        checkUi();
+
         if (ui.hasAuthenticatedSession()) {
             return false;
         }
@@ -71,7 +92,9 @@ public abstract class AbstractNavigationHandler implements NavigationHandler {
                         .isScreenPermitted(windowInfo.getId());
     }
 
-    protected void redirect(NavigationState navigationState, AppUI ui, BeanLocator beanLocator) {
+    protected void redirect(NavigationState navigationState) {
+        checkUi();
+
         String loginScreenId = beanLocator.get(Configuration.class)
                 .getConfig(WebConfig.class)
                 .getLoginScreenId();
@@ -86,12 +109,14 @@ public abstract class AbstractNavigationHandler implements NavigationHandler {
         ui.getUrlChangeHandler().setRedirectHandler(redirectHandler);
     }
 
-    protected boolean isNotPermittedToNavigate(NavigationState requestedState, WindowInfo windowInfo,
-                                               Security security, AppUI ui) {
+    protected boolean isNotPermittedToNavigate(NavigationState requestedState, WindowInfo windowInfo) {
+        checkUi();
+
+        Security security = beanLocator.get(Security.NAME);
 
         boolean screenPermitted = security.isScreenPermitted(windowInfo.getId());
         if (!screenPermitted) {
-            revertNavigationState(ui);
+            revertNavigationState();
 
             throw new AccessDeniedException(PermissionType.SCREEN, windowInfo.getId());
         }
@@ -104,7 +129,7 @@ public abstract class AbstractNavigationHandler implements NavigationHandler {
                 urlChangeHandler.showNotification(navigationAllowed.getMessage());
             }
 
-            revertNavigationState(ui);
+            revertNavigationState();
 
             return true;
         }

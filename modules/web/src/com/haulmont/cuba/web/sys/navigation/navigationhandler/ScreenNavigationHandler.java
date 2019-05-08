@@ -70,11 +70,16 @@ public class ScreenNavigationHandler extends AbstractNavigationHandler implement
     protected DataManager dataManager;
     @Inject
     protected Metadata metadata;
+
     @Inject
-    protected BeanLocator beanLocator;
+    public ScreenNavigationHandler(BeanLocator beanLocator) {
+        super(beanLocator);
+    }
 
     @Override
     public boolean doHandle(NavigationState requestedState, AppUI ui) {
+        setUi(ui);
+
         if (isEmptyState(requestedState)) {
             return false;
         }
@@ -86,7 +91,7 @@ public class ScreenNavigationHandler extends AbstractNavigationHandler implement
         String requestedRoute = requestedState.getNestedRoute();
         if (StringUtils.isEmpty(requestedRoute)) {
             log.info("Unable to handle state with empty route '{}'", requestedState);
-            revertNavigationState(ui);
+            revertNavigationState();
 
             return true;
         }
@@ -99,7 +104,7 @@ public class ScreenNavigationHandler extends AbstractNavigationHandler implement
         if (routeParts.length > MAX_SUB_ROUTES) {
             log.info("Unable to perform navigation to requested state '{}'. Only {} sub routes are supported",
                     requestedRoute, MAX_SUB_ROUTES);
-            revertNavigationState(ui);
+            revertNavigationState();
 
             return true;
         }
@@ -112,21 +117,21 @@ public class ScreenNavigationHandler extends AbstractNavigationHandler implement
             WindowInfo routeWindowInfo = entry.getSecond();
             if (routeWindowInfo == null) {
                 log.info("No registered screen found for route: '{}'", entry.getFirst());
-                revertNavigationState(ui);
+                revertNavigationState();
 
                 handle404(entry.getFirst(), ui);
 
                 return true;
             }
 
-            if (shouldRedirect(routeWindowInfo, beanLocator, ui)) {
-                redirect(requestedState, ui, beanLocator);
+            if (shouldRedirect(routeWindowInfo)) {
+                redirect(requestedState);
                 return true;
             }
 
             if (isRootRoute(routeWindowInfo)) {
                 log.info("Unable navigate to '{}' as nested screen", routeWindowInfo.getId());
-                revertNavigationState(ui);
+                revertNavigationState();
 
                 return true;
             }
@@ -220,7 +225,7 @@ public class ScreenNavigationHandler extends AbstractNavigationHandler implement
     }
 
     protected void openScreen(NavigationState requestedState, String screenRoute, WindowInfo windowInfo, AppUI ui) {
-        if (isNotPermittedToNavigate(requestedState, windowInfo, security, ui)) {
+        if (isNotPermittedToNavigate(requestedState, windowInfo)) {
             return;
         }
 
@@ -230,7 +235,7 @@ public class ScreenNavigationHandler extends AbstractNavigationHandler implement
             log.info("Unable to open screen '{}' for requested route '{}'", windowInfo.getId(),
                     requestedState.getNestedRoute());
 
-            revertNavigationState(ui);
+            revertNavigationState();
             return;
         }
 
@@ -314,7 +319,7 @@ public class ScreenNavigationHandler extends AbstractNavigationHandler implement
         MetaClass metaClass = metadata.getClassNN(entityClass);
 
         if (!security.isEntityOpPermitted(metaClass, EntityOp.READ)) {
-            revertNavigationState(ui);
+            revertNavigationState();
             throw new AccessDeniedException(PermissionType.ENTITY_OP, EntityOp.READ, entityClass.getSimpleName());
         }
 
@@ -328,7 +333,7 @@ public class ScreenNavigationHandler extends AbstractNavigationHandler implement
 
         Entity entity = dataManager.load(ctx);
         if (entity == null) {
-            revertNavigationState(ui);
+            revertNavigationState();
             throw new EntityAccessException(metaClass, id);
         }
 

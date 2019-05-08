@@ -16,6 +16,7 @@
 
 package com.haulmont.cuba.web.sys.navigation.navigationhandler;
 
+import com.haulmont.cuba.core.global.BeanLocator;
 import com.haulmont.cuba.gui.navigation.NavigationState;
 import com.haulmont.cuba.gui.navigation.UrlParamsChangedEvent;
 import com.haulmont.cuba.gui.screen.Screen;
@@ -29,6 +30,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
 import java.util.Collections;
 import java.util.Map;
 
@@ -39,8 +41,15 @@ public class ParamsNavigationHandler extends AbstractNavigationHandler implement
 
     private static final Logger log = LoggerFactory.getLogger(ParamsNavigationHandler.class);
 
+    @Inject
+    public ParamsNavigationHandler(BeanLocator beanLocator) {
+        super(beanLocator);
+    }
+
     @Override
     public boolean doHandle(NavigationState requestedState, AppUI ui) {
+        setUi(ui);
+
         Screen screen = ui.getUrlChangeHandler().getActiveScreen();
         if (screen == null) {
             log.debug("Unable to find a screen for state: '{}", requestedState);

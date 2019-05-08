@@ -16,6 +16,7 @@
 
 package com.haulmont.cuba.web.sys.navigation.navigationhandler;
 
+import com.haulmont.cuba.core.global.BeanLocator;
 import com.haulmont.cuba.gui.navigation.NavigationState;
 import com.haulmont.cuba.web.AppUI;
 import org.slf4j.Logger;
@@ -25,6 +26,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
+
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Order(NavigationHandler.LOWEST_PLATFORM_PRECEDENCE - 10)
@@ -32,15 +35,22 @@ public class NoopNavigationHandler extends AbstractNavigationHandler implements 
 
     private static final Logger log = LoggerFactory.getLogger(NoopNavigationHandler.class);
 
+    @Inject
+    public NoopNavigationHandler(BeanLocator beanLocator) {
+        super(beanLocator);
+    }
+
     @Override
     public boolean doHandle(NavigationState requestedState, AppUI ui) {
+        setUi(ui);
+
         if (isEmptyState(requestedState)) {
             log.debug("Unable to navigate to empty route: '{}'", requestedState);
             return false;
         }
 
         log.info("Failed to handle a route: '{}'", requestedState.asRoute());
-        revertNavigationState(ui);
+        revertNavigationState();
 
         return false;
     }

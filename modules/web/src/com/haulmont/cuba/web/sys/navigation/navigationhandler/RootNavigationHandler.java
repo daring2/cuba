@@ -53,8 +53,15 @@ public class RootNavigationHandler extends AbstractNavigationHandler implements 
     @Inject
     protected BeanLocator beanLocator;
 
+    @Inject
+    public RootNavigationHandler(BeanLocator beanLocator) {
+        super(beanLocator);
+    }
+
     @Override
     public boolean doHandle(NavigationState requestedState, AppUI ui) {
+        setUi(ui);
+
         if (isEmptyState(requestedState)) {
             return false;
         }
@@ -66,17 +73,17 @@ public class RootNavigationHandler extends AbstractNavigationHandler implements 
         WindowInfo windowInfo = windowConfig.findWindowInfoByRoute(requestedState.getRoot());
         if (windowInfo == null) {
             log.info("No screen found registered for route '{}'", requestedState.getRoot());
-            revertNavigationState(ui);
+            revertNavigationState();
             return true;
         }
 
-        if (shouldRedirect(windowInfo, beanLocator, ui)) {
-            redirect(requestedState, ui, beanLocator);
+        if (shouldRedirect(windowInfo)) {
+            redirect(requestedState);
             return true;
         }
 
-        if (isNotPermittedToNavigate(requestedState, windowInfo, security, ui)) {
-            revertNavigationState(ui);
+        if (isNotPermittedToNavigate(requestedState, windowInfo)) {
+            revertNavigationState();
             return true;
         }
 
