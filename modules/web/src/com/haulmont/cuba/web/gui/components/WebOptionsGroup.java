@@ -59,6 +59,11 @@ public class WebOptionsGroup<V, I> extends WebAbstractField<CubaOptionGroup, V> 
         return new CubaOptionGroup();
     }
 
+    @Override
+    public V getValue() {
+        return convertToModel(component.getValue());
+    }
+
     protected String generateDefaultItemCaption(I item) {
         if (valueBinding != null && valueBinding.getSource() instanceof EntityValueSource) {
             EntityValueSource entityValueSource = (EntityValueSource) valueBinding.getSource();
@@ -78,18 +83,6 @@ public class WebOptionsGroup<V, I> extends WebAbstractField<CubaOptionGroup, V> 
         }
 
         return generateDefaultItemCaption(item);
-    }
-
-    @Override
-    public V getValue() {
-        return internalValue;
-    }
-
-    @Override
-    public void setValue(V value) {
-        internalValue = value;
-
-        setValueToPresentation(convertToPresentation(value));
     }
 
     @Inject
