@@ -16,9 +16,9 @@
 
 package com.haulmont.cuba.web.sys.navigation.navigationhandler;
 
-import com.haulmont.cuba.core.global.BeanLocator;
 import com.haulmont.cuba.gui.navigation.NavigationState;
 import com.haulmont.cuba.web.AppUI;
+import com.haulmont.cuba.web.sys.navigation.UrlChangeHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -26,31 +26,24 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
-
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Order(NavigationHandler.LOWEST_PLATFORM_PRECEDENCE - 10)
-public class NoopNavigationHandler extends AbstractNavigationHandler implements NavigationHandler {
+public class NoopNavigationHandler implements NavigationHandler {
 
     private static final Logger log = LoggerFactory.getLogger(NoopNavigationHandler.class);
 
-    @Inject
-    public NoopNavigationHandler(BeanLocator beanLocator) {
-        super(beanLocator);
-    }
-
     @Override
     public boolean doHandle(NavigationState requestedState, AppUI ui) {
-        setUi(ui);
+        UrlChangeHandler urlChangeHandler = ui.getUrlChangeHandler();
 
-        if (isEmptyState(requestedState)) {
+        if (urlChangeHandler.isEmptyState(requestedState)) {
             log.debug("Unable to navigate to empty route: '{}'", requestedState);
             return false;
         }
 
         log.info("Failed to handle a route: '{}'", requestedState.asRoute());
-        revertNavigationState();
+        urlChangeHandler.revertNavigationState();
 
         return false;
     }

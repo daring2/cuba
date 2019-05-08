@@ -16,7 +16,6 @@
 
 package com.haulmont.cuba.web.sys.navigation.navigationhandler;
 
-import com.haulmont.cuba.core.global.BeanLocator;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.config.WindowInfo;
 import com.haulmont.cuba.gui.navigation.NavigationState;
@@ -24,6 +23,7 @@ import com.haulmont.cuba.gui.screen.OpenMode;
 import com.haulmont.cuba.gui.screen.Screen;
 import com.haulmont.cuba.web.AppUI;
 import com.haulmont.cuba.web.gui.WebWindow;
+import com.haulmont.cuba.web.sys.navigation.UrlChangeHandler;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -38,23 +38,18 @@ import javax.inject.Inject;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Order(NavigationHandler.LOWEST_PLATFORM_PRECEDENCE - 40)
-public class RootNavigationHandler extends AbstractNavigationHandler implements NavigationHandler {
+public class RootNavigationHandler implements NavigationHandler {
 
     private static final Logger log = LoggerFactory.getLogger(RootNavigationHandler.class);
 
     @Inject
     protected WindowConfig windowConfig;
 
-    @Inject
-    public RootNavigationHandler(BeanLocator beanLocator) {
-        super(beanLocator);
-    }
-
     @Override
     public boolean doHandle(NavigationState requestedState, AppUI ui) {
-        setUi(ui);
+        UrlChangeHandler urlChangeHandler = ui.getUrlChangeHandler();
 
-        if (isEmptyState(requestedState)) {
+        if (urlChangeHandler.isEmptyState(requestedState)) {
             return false;
         }
 
@@ -65,17 +60,17 @@ public class RootNavigationHandler extends AbstractNavigationHandler implements 
         WindowInfo windowInfo = windowConfig.findWindowInfoByRoute(requestedState.getRoot());
         if (windowInfo == null) {
             log.info("No screen found registered for route '{}'", requestedState.getRoot());
-            revertNavigationState();
+            urlChangeHandler.revertNavigationState();
             return true;
         }
 
-        if (shouldRedirect(windowInfo)) {
-            redirect(requestedState);
+        if (urlChangeHandler.shouldRedirect(windowInfo)) {
+            urlChangeHandler.redirect(requestedState);
             return true;
         }
 
-        if (isNotPermittedToNavigate(requestedState, windowInfo)) {
-            revertNavigationState();
+        if (urlChangeHandler.isNotPermittedToNavigate(requestedState, windowInfo)) {
+            urlChangeHandler.revertNavigationState();
             return true;
         }
 
