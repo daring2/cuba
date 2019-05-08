@@ -2169,6 +2169,8 @@
                 <xs:attribute name="focusable" type="xs:boolean"/>
                 <xs:attribute name="disableOnClick" type="xs:boolean"/>
 
+                <xs:attribute name="shortcut" type="shortcut"/>
+
                 <xs:attributeGroup ref="hasTabIndex"/>
             </xs:extension>
         </xs:complexContent>
