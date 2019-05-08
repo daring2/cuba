@@ -118,8 +118,10 @@ public class WebOptionsList<V, I> extends WebAbstractField<CubaListSelect, V>
             Set collectionValue = (Set) componentRawValue;
 
             List<I> itemIds = getCurrentItems();
-            Stream<I> selectedItemsStream = itemIds.stream()
-                    .filter(collectionValue::contains);
+
+            //noinspection RedundantCast
+            Stream<I> selectedItemsStream = collectionValue.stream()
+                    .filter(item -> itemIds.isEmpty() || itemIds.contains((I) item));
 
             if (valueBinding != null) {
                 Class<V> targetType = valueBinding.getSource().getType();
