@@ -16,21 +16,14 @@
 
 package spec.cuba.web.fragments.screens;
 
-import com.haulmont.cuba.gui.Fragments;
-import com.haulmont.cuba.gui.screen.Screen;
-import com.haulmont.cuba.gui.screen.Subscribe;
-import com.haulmont.cuba.gui.screen.UiController;
-
-import javax.inject.Inject;
+import com.haulmont.cuba.gui.screen.*;
 
 @UiController
-public class ScreenWithFragment extends Screen {
-    @Inject
-    protected Fragments fragments;
+public class FragmentWithParentListener extends ScreenFragment {
+    public int showEvents = 0;
 
-    @Subscribe
-    protected void onInit(InitEvent event) {
-        FragmentWithAttachListener fragment = fragments.create(this, FragmentWithAttachListener.class);
-        getWindow().add(fragment.getFragment());
+    @Subscribe(target = Target.PARENT_CONTROLLER)
+    protected void onShow(Screen.BeforeShowEvent event) {
+        showEvents += 1;
     }
 }

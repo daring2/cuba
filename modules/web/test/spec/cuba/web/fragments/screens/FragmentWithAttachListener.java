@@ -16,21 +16,30 @@
 
 package spec.cuba.web.fragments.screens;
 
-import com.haulmont.cuba.gui.Fragments;
-import com.haulmont.cuba.gui.screen.Screen;
+import com.haulmont.cuba.gui.screen.ScreenFragment;
 import com.haulmont.cuba.gui.screen.Subscribe;
 import com.haulmont.cuba.gui.screen.UiController;
 
-import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 
-@UiController
-public class ScreenWithFragment extends Screen {
-    @Inject
-    protected Fragments fragments;
+@UiController("test_TestAttachFragment")
+public class FragmentWithAttachListener extends ScreenFragment {
+
+    public List<Class> eventLog = new ArrayList<>();
+
+    @Subscribe
+    protected void onAttach(AttachEvent event) {
+        eventLog.add(AttachEvent.class);
+    }
 
     @Subscribe
     protected void onInit(InitEvent event) {
-        FragmentWithAttachListener fragment = fragments.create(this, FragmentWithAttachListener.class);
-        getWindow().add(fragment.getFragment());
+        eventLog.add(InitEvent.class);
+    }
+
+    @Subscribe
+    protected void onAfterInit(AfterInitEvent event) {
+        eventLog.add(AfterInitEvent.class);
     }
 }
